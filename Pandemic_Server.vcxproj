@@ -140,13 +140,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\client_input.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\in_error.cpp" />
     <ClCompile Include="src\in_idle.cpp" />
     <ClCompile Include="src\in_move.cpp" />
+    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\msg_manager.cpp" />
     <ClCompile Include="src\opcode_in.cpp" />
     <ClCompile Include="src\opcode_manager.cpp" />
