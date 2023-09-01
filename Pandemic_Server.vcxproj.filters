@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Opcodes">
+      <UniqueIdentifier>{61585967-3a09-4572-9d06-b7eec3123f60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Opcodes\In">
+      <UniqueIdentifier>{88078fe6-bccc-40cc-b178-be92823aa39a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Opcodes\Out">
+      <UniqueIdentifier>{fb102e1f-9e1f-4d69-92e9-525bb609ca4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Opcodes">
+      <UniqueIdentifier>{02552fda-dc88-49ea-8e67-39e455c18d88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Opcodes\In">
+      <UniqueIdentifier>{17bc8a70-a643-4b2c-9c0b-9910544a0266}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Opcodes\Out">
+      <UniqueIdentifier>{3e406dec-4bd0-4a09-b40d-5242f68ddcd3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\server.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\msg_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcode_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client_input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\in_error.cpp">
+      <Filter>Source Files\Opcodes\In</Filter>
+    </ClCompile>
+    <ClCompile Include="src\in_idle.cpp">
+      <Filter>Source Files\Opcodes\In</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcode_in.cpp">
+      <Filter>Source Files\Opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opcode_out.cpp">
+      <Filter>Source Files\Opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\out_send_message.cpp">
+      <Filter>Source Files\Opcodes\Out</Filter>
+    </ClCompile>
+    <ClCompile Include="src\in_move.cpp">
+      <Filter>Source Files\Opcodes\In</Filter>
+    </ClCompile>
+    <ClCompile Include="src\out_update_players.cpp">
+      <Filter>Source Files\Opcodes\Out</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\inc\server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\msg_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\opcode_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\client_input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\opcode_in.h">
+      <Filter>Header Files\Opcodes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\opcode_out.h">
+      <Filter>Header Files\Opcodes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\out_send_message.h">
+      <Filter>Header Files\Opcodes\Out</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\in_error.h">
+      <Filter>Header Files\Opcodes\In</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\in_idle.h">
+      <Filter>Header Files\Opcodes\In</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\in_move.h">
+      <Filter>Header Files\Opcodes\In</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\out_update_players.h">
+      <Filter>Header Files\Opcodes\Out</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
