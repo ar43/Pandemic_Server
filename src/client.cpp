@@ -5,7 +5,7 @@
 #include "utility.h"
 #include "client_input.h"
 
-#include "out_send_message.h"
+#include "out_message.h"
 
 Client::Client(SOCKET socket, randutils::mt19937_rng *rng)
 {
@@ -32,7 +32,7 @@ void Client::Drop(std::string reason)
 	//closesocket(socket);
 }
 
-void Client::AddToGame()
+void Client::AddToLobby()
 {
 	//static uint64_t identifier = 0;
 	//msg_manager->WriteByte(2);
@@ -42,7 +42,7 @@ void Client::AddToGame()
 	state = CSTATE_LOBBY;
 	//msg_manager->InitEncryption(client_session_key, server_session_key);
 	//printf("!!!!decryption: %llx %llx\n", client_session_key, server_session_key);
-	OutSendMessage welcome("U are in lobby\n");
+	OutMessage welcome("U are in lobby");
 	opcode_manager->Send(welcome);
 	timeout_counter = 0;
 }
@@ -61,13 +61,25 @@ void Client::UpdateAwaiting(uint8_t current_players, uint8_t max_players)
 
 	timeout_counter++;
 
-	if (input.empty())
-		return;
-	spdlog::info("AWAITING");
-	if (msg_manager->ReadByte() == 14)
+	
+	
+	if (awaiting_substate == 0)
 	{
-		if(current_players < max_players)
-			AddToGame();
+		spdlog::info("sent 17");
+		msg_manager->WriteByte(17);
+		awaiting_substate = 1;
+	}
+	else if (awaiting_substate == 1)
+	{
+		if (!msg_manager->PendingInput())
+			return;
+
+		if (msg_manager->ReadByte() == 14)
+		{
+			spdlog::info("received 14");
+			if(current_players < max_players)
+				AddToLobby();
+		}
 	}
 	
 }
@@ -104,7 +116,7 @@ void Client::Update()
 
 		if (time == 0)
 		{
-			OutSendMessage welcome("U are in game\n");
+			OutMessage welcome("U are in game\n");
 			opcode_manager->Send(welcome);
 
 			//OpShowInterface design(3559);
@@ -206,12 +218,12 @@ void Client::SendOutput()
 	spdlog::debug("SendOutput: bytes sent: {}", iSendResult);
 }
 
-uint16_t Client::GetPid()
+uint8_t Client::GetPid()
 {
 	return pid;
 }
 
-void Client::SetPid(uint16_t pid)
+void Client::SetPid(uint8_t pid)
 {
 	this->pid = pid;
 }

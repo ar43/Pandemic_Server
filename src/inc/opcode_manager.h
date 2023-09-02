@@ -14,7 +14,7 @@ public:
 
 	void Send(OpcodeOut& opcode);
 
-	void Receive(std::shared_ptr<ClientInput> const& client_input, uint16_t pid);
+	void Receive(std::shared_ptr<ClientInput> const& client_input, uint8_t pid);
 
 private:
 	std::shared_ptr<MsgManager> msg_manager;

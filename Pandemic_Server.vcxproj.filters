@@ -66,7 +66,7 @@
     <ClCompile Include="src\opcode_out.cpp">
       <Filter>Source Files\Opcodes</Filter>
     </ClCompile>
-    <ClCompile Include="src\out_send_message.cpp">
+    <ClCompile Include="src\out_message.cpp">
       <Filter>Source Files\Opcodes\Out</Filter>
     </ClCompile>
     <ClCompile Include="src\in_move.cpp">
@@ -107,7 +107,7 @@
     <ClInclude Include="src\inc\opcode_out.h">
       <Filter>Header Files\Opcodes</Filter>
     </ClInclude>
-    <ClInclude Include="src\inc\out_send_message.h">
+    <ClInclude Include="src\inc\out_message.h">
       <Filter>Header Files\Opcodes\Out</Filter>
     </ClInclude>
     <ClInclude Include="src\inc\in_error.h">

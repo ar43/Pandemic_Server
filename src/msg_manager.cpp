@@ -61,15 +61,14 @@ uint64_t MsgManager::ReadLong()
 	return (a << 32) + b;
 }
 
-std::string MsgManager::ReadString()
+std::string MsgManager::ReadString(uint8_t length)
 {
 	std::string str = "";
-	char c = (char)ReadByte();
-	while (c != '\n')
+	for (int i = 0; i < length; i++)
 	{
-		std::string s{c};
+		char c = (char)ReadByte();
+		std::string s{ c };
 		str = str + s;
-		c = (char)ReadByte();
 	}
 	return str;
 }

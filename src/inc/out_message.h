@@ -3,11 +3,11 @@
 #include "opcode_out.h"
 #include <string>
 
-class OutSendMessage : public OpcodeOut
+class OutMessage : public OpcodeOut
 {
 public:
-	OutSendMessage(std::string msg);
-	~OutSendMessage();
+	OutMessage(std::string msg);
+	~OutMessage();
 
 	void Send(std::shared_ptr<MsgManager> const& msg_manager);
 private:

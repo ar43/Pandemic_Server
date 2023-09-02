@@ -17,7 +17,7 @@ public:
 	uint16_t ReadShort();
 	uint32_t ReadInt();
 	uint64_t ReadLong();
-	std::string ReadString();
+	std::string ReadString(uint8_t length);
 	void ReadDiscard(int num);
 
 	void WriteByte(uint8_t value);

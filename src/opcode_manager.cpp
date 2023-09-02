@@ -6,6 +6,7 @@
 #include "opcode_in.h"
 #include "in_idle.h"
 #include "in_error.h"
+#include "in_move.h"
 
 OpcodeManager::OpcodeManager(std::shared_ptr<MsgManager> msg_manager)
 {
@@ -19,7 +20,7 @@ void OpcodeManager::Send(OpcodeOut & opcode)
 	opcode.Send(msg_manager);
 }
 
-void OpcodeManager::Receive(std::shared_ptr<ClientInput> const& client_input, uint16_t pid)
+void OpcodeManager::Receive(std::shared_ptr<ClientInput> const& client_input, uint8_t pid)
 {
 	while (msg_manager->PendingInput())
 	{
@@ -43,6 +44,7 @@ std::unique_ptr<OpcodeIn> OpcodeManager::GetOpcode(uint8_t id)
 	switch (id)
 	{
 		case 0: return std::make_unique<InIdle>();
+		case 1: return std::make_unique<InMove>();
 		default: return std::make_unique<InError>();
 
 	}

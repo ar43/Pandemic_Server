@@ -14,6 +14,7 @@ struct ClientInput;
 
 enum ClientState
 {
+	CSTATE_UNCONNECTED, //unused server-side
 	CSTATE_AWAITING,
 	CSTATE_LOBBY,
 	CSTATE_GAME
@@ -32,15 +33,15 @@ public:
 	void ReadInput();
 	void SendOutput();
 
-	uint16_t GetPid();
-	void SetPid(uint16_t pid);
+	uint8_t GetPid();
+	void SetPid(uint8_t pid);
 
 	void UpdateAwaiting(uint8_t current_players, uint8_t max_players);
 	void Update();
 
 	SOCKET socket;
 
-	int logged_state = 0;
+	int awaiting_substate = 0;
 	ClientState state;
 	bool dropped = false;
 	bool disconnected = false;
@@ -50,7 +51,7 @@ public:
 private:
 	uint64_t time = 0;
 	int timeout_counter = 0;
-	uint16_t pid;
+	uint8_t pid;
 	bool sent_welcome_message = false;
 	randutils::mt19937_rng *rng = nullptr;
 	uint32_t current_region = 0;
@@ -60,6 +61,6 @@ private:
 
 	void Drop(std::string reason);
 	void RejectConnection(uint8_t code);
-	void AddToGame();
+	void AddToLobby();
 	void CheckTimeout();
 };
