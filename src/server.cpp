@@ -24,7 +24,7 @@
 
 Server::Server()
 {
-	game = std::make_unique<Game>(&players);
+	game = std::make_unique<Game>();
 }
 
 bool Server::Init()
@@ -131,13 +131,37 @@ void Server::AcceptNewConnections()
     }
 }
 
+void Server::UpdatePlayers()
+{
+	for (auto& it : game->players)
+	{
+		it->Update();
+	}
+
+	for (auto it = game->players.begin(); it != game->players.end();)
+	{
+		if ((*it)->dropped)
+		{
+			if((*it)->state == CSTATE_GAME)
+				spdlog::error("player dropped while ingame!");
+			closesocket((*it)->socket);
+			it = game->players.erase(it);
+		}
+		else
+		{
+			it++;
+		}
+	}
+
+}
+
 void Server::ReadClientData()
 {
     for (auto& it : awaiting_clients)
     {
         it->ReadInput();
     }
-    for (auto& it : players)
+    for (auto& it : game->players)
     {
         it->ReadInput();
     }
@@ -148,13 +172,13 @@ void Server::UpdateAwaitingClients()
     
     for (auto it = awaiting_clients.begin(); it != awaiting_clients.end();)
     {
-        (*it)->UpdateAwaiting((uint8_t)players.size(),(uint8_t)max_players);
+        (*it)->UpdateAwaiting((uint8_t)game->players.size(),(uint8_t)max_players);
         if ((*it)->state == CSTATE_LOBBY)
         {
 			(*it)->SetPid(GeneratePid());
-            players.push_back(*it);
+			game->players.push_back(*it);
             it = awaiting_clients.erase(it);
-			if (players.size() == max_players)
+			if (game->players.size() == max_players)
 			{
 				game->Start();
 			}
@@ -171,35 +195,13 @@ void Server::UpdateAwaitingClients()
     }
 }
 
-void Server::UpdatePlayers()
-{
-    for (auto& it : players)
-    {
-        it->Update();
-    }
-
-    for (auto it = players.begin(); it != players.end();)
-    {
-        if ((*it)->dropped)
-        {
-            closesocket((*it)->socket);
-            it = players.erase(it);
-        }
-        else
-        {
-            it++;
-        }
-    }
-
-}
-
 void Server::WriteClientData()
 {
     for (auto& it : awaiting_clients)
     {
 		it->SendOutput();
     }
-    for (auto& it : players)
+    for (auto& it : game->players)
     {
         it->SendOutput();
     }
@@ -207,11 +209,11 @@ void Server::WriteClientData()
 
 uint8_t Server::GeneratePid()
 {
-	if (players.size() >= max_players)
+	if (game->players.size() >= max_players)
 	{
 		spdlog::error("server full");
 		return 0;
 	}
 	
-	return (uint8_t)players.size();
+	return (uint8_t)game->players.size();
 }

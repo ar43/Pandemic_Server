@@ -4,22 +4,6 @@
 #include <memory>
 #include <string>
 
-enum class DataSubtype
-{
-	Normal,
-	SpecialA,
-	SpecialC,
-	SpecialS
-};
-
-enum class ByteOrder
-{
-	BigEndian,
-	LittleEndian,
-	MiddleEndianBigInt,
-	MiddleEndianSmallInt
-};
-
 class MsgManager
 {
 public:
@@ -28,19 +12,19 @@ public:
 
 	void InitEncryption(uint64_t client_session_key, uint64_t server_session_key);
 
-	uint8_t ReadByte(DataSubtype type = DataSubtype::Normal);
+	uint8_t ReadByte();
 	uint8_t ReadOpcode();
-	uint16_t ReadShort(ByteOrder order = ByteOrder::BigEndian, DataSubtype type = DataSubtype::Normal);
+	uint16_t ReadShort();
 	uint32_t ReadInt();
 	uint64_t ReadLong();
 	std::string ReadString();
 	void ReadDiscard(int num);
 
-	void WriteByte(uint8_t value, DataSubtype type = DataSubtype::Normal);
+	void WriteByte(uint8_t value);
 	void WriteOpcode(uint8_t op);
 	void WriteNull(int len);
-	void WriteShort(uint16_t num, ByteOrder order = ByteOrder::BigEndian, DataSubtype type = DataSubtype::Normal);
-	void WriteInt(uint32_t num, ByteOrder order = ByteOrder::BigEndian, DataSubtype type = DataSubtype::Normal);
+	void WriteShort(uint16_t num);
+	void WriteInt(uint32_t num);
 	void WriteLong(uint64_t num);
 	void WriteString(std::string str);
 

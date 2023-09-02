@@ -17,34 +17,11 @@ void MsgManager::InitEncryption(uint64_t client_session_key, uint64_t server_ses
 	//packetEncryption = std::make_unique<Encryption>(client_session_key, server_session_key, false);
 }
 
-uint8_t MsgManager::ReadByte(DataSubtype type)
+uint8_t MsgManager::ReadByte()
 {
 	if (!input->empty())
 	{
 		auto ret = (uint8_t)input->front();
-
-		switch (type)
-		{
-			case DataSubtype::Normal:
-			{
-				break;
-			}
-			case DataSubtype::SpecialA:
-			{
-				ret = ret - 128;
-				break;
-			}
-			case DataSubtype::SpecialS:
-			{
-				ret = 128 - ret;
-				break;
-			}
-			case DataSubtype::SpecialC:
-			{
-				ret = 0 - ret;
-				break;
-			}
-		}
 
 		input->pop();
 		return ret;
@@ -62,31 +39,10 @@ uint8_t MsgManager::ReadOpcode()
 	return opcode;
 }
 
-uint16_t MsgManager::ReadShort(ByteOrder order, DataSubtype type)
+uint16_t MsgManager::ReadShort()
 {
-	uint16_t a = 0;
-	uint16_t b = 0;
-
-	switch (order)
-	{
-		case ByteOrder::BigEndian:
-		{
-			a = (uint16_t)ReadByte();
-			b = (uint16_t)ReadByte(type);
-			break;
-		}
-		case ByteOrder::LittleEndian:
-		{
-			b = (uint16_t)ReadByte(type);
-			a = (uint16_t)ReadByte();
-			break;
-		}
-		default:
-		{
-			spdlog::error("MsgManager::ReadShort: invalid order");
-			break;
-		}
-	}
+	uint16_t a = (uint16_t)ReadByte();
+	uint16_t b = (uint16_t)ReadByte();
 
 	return (a << 8) + b;
 }
@@ -129,35 +85,8 @@ void MsgManager::ReadDiscard(int num)
 	}
 }
 
-void MsgManager::WriteByte(uint8_t value, DataSubtype type)
+void MsgManager::WriteByte(uint8_t value)
 {
-	switch (type)
-	{
-	case DataSubtype::Normal:
-	{
-		break;
-	}
-	case DataSubtype::SpecialC:
-	{
-		value = 0 - value;
-		break;
-	}
-	case DataSubtype::SpecialA:
-	{
-		value += 128;
-		break;
-	}
-	case DataSubtype::SpecialS:
-	{
-		value = 128 - value;
-		break;
-	}
-	default:
-	{
-		spdlog::error("WriteByte: unhandled DataSubtype");
-		break;
-	}
-	}
 	output->push(value);
 }
 
@@ -174,65 +103,18 @@ void MsgManager::WriteNull(int len)
 	}
 }
 
-void MsgManager::WriteShort(uint16_t num, ByteOrder order, DataSubtype type)
+void MsgManager::WriteShort(uint16_t num)
 {
-	switch (order)
-	{
-		case ByteOrder::LittleEndian:
-		{
-			WriteByte(num & 0xFF, type);
-			WriteByte((uint8_t)((num >> 8) & 0xFF));
-			break;
-		}
-		case ByteOrder::BigEndian:
-		{
-			WriteByte((uint8_t)((num >> 8) & 0xFF));
-			WriteByte(num & 0xFF, type);
-			break;
-		}
-		default:
-		{
-			spdlog::error("WriteInt: unhandled ByteOrder");
-			break;
-		}
-	}
-	
+	WriteByte((uint8_t)((num >> 8) & 0xFF));
+	WriteByte(num & 0xFF);
 }
 
-void MsgManager::WriteInt(uint32_t num, ByteOrder order, DataSubtype type)
+void MsgManager::WriteInt(uint32_t num)
 {
-	switch (order)
-	{
-		case ByteOrder::LittleEndian:
-		{
-			WriteByte(num & 0xFF, type);
-			WriteByte((uint8_t)((num >> 8) & 0xFF));
-			WriteByte((uint8_t)((num >> 16) & 0xFF));
-			WriteByte((uint8_t)((num >> 24) & 0xFF));
-			break;
-		}
-		case ByteOrder::BigEndian:
-		{
-			WriteByte((uint8_t)((num >> 24) & 0xFF));
-			WriteByte((uint8_t)((num >> 16) & 0xFF));
-			WriteByte((uint8_t)((num >> 8) & 0xFF));
-			WriteByte(num & 0xFF, type);
-			break;
-		}
-		case ByteOrder::MiddleEndianBigInt:
-		{
-			WriteByte((uint8_t)((num >> 8) & 0xFF));
-			WriteByte(num & 0xFF, type);
-			WriteByte((uint8_t)((num >> 24) & 0xFF));
-			WriteByte((uint8_t)((num >> 16) & 0xFF));
-			break;
-		}
-		default:
-		{
-			spdlog::error("WriteInt: unhandled ByteOrder");
-			break;
-		}
-	}
+	WriteByte((uint8_t)((num >> 24) & 0xFF));
+	WriteByte((uint8_t)((num >> 16) & 0xFF));
+	WriteByte((uint8_t)((num >> 8) & 0xFF));
+	WriteByte(num & 0xFF);
 }
 
 void MsgManager::WriteLong(uint64_t num)
@@ -248,7 +130,7 @@ void MsgManager::WriteLong(uint64_t num)
 
 void MsgManager::WriteString(std::string str)
 {
-	for (int i = 0; i < str.length(); i++)
+	for (size_t i = 0; i < str.length(); i++)
 	{
 		WriteByte(str[i]);
 	}

@@ -29,7 +29,6 @@ private:
 	bool running;
 	SOCKET listen_socket;
 	std::vector<std::shared_ptr<Client>> awaiting_clients;
-	std::vector<std::shared_ptr<Client>> players;
 	std::unique_ptr<Game> game;
 
 	fd_set master_set, working_set;

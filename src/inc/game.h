@@ -10,16 +10,17 @@ class OpcodeOut;
 class Game
 {
 public:
-	Game(std::vector<std::shared_ptr<Client>>* players);
+	Game();
 	bool IsInProgress();
 	void Update();
 	void Start();
+	std::vector<std::shared_ptr<Client>> players;
 
 private:
+	
 	void UpdateGameState();
 	void ProcessInput();
 	void Broadcast(OpcodeOut& opcode);
 	bool in_progress = false;
-	std::vector<std::shared_ptr<Client>> *players;
 	uint8_t positions[MAX_PLAYERS];
 };

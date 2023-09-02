@@ -6,6 +6,7 @@
 
 int main()
 {
+	spdlog::set_level(spdlog::level::debug); // Set global log level to debug
 	Server* server = new Server();
 
 	//spdlog::set_level(spdlog::level::debug);

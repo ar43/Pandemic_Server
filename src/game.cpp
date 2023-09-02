@@ -5,11 +5,8 @@
 #include "opcode_manager.h"
 #include "out_update_players.h"
 
-Game::Game(std::vector<std::shared_ptr<Client>>* players)
+Game::Game()
 {
-	this->players = players;
-	if (this->players == NULL)
-		spdlog::error("game has null players function");
 }
 
 bool Game::IsInProgress()
@@ -23,14 +20,16 @@ void Game::Update()
 		return;
 	ProcessInput();
 	UpdateGameState();
+	OutUpdatePlayers update_players((uint8_t)players.size(), positions);
+	Broadcast(update_players);
 }
 
 void Game::Start()
 {
 	in_progress = true;
-	for (int i = 0; i < players->size(); i++)
+	for (int i = 0; i < players.size(); i++)
 	{
-		auto &player = players->at(i);
+		auto &player = players.at(i);
 
 		player->state = CSTATE_GAME;
 	}
@@ -38,9 +37,9 @@ void Game::Start()
 
 void Game::UpdateGameState()
 {
-	for (int i = 0; i < players->size(); i++)
+	for (int i = 0; i < players.size(); i++)
 	{
-		auto &player = players->at(i);
+		auto &player = players.at(i);
 		
 		positions[player->GetPid()] = player->position;
 	}
@@ -48,10 +47,10 @@ void Game::UpdateGameState()
 
 void Game::ProcessInput()
 {
-	for (int i = 0; i < players->size(); i++)
+	for (int i = 0; i < players.size(); i++)
 	{
-		auto &player = players->at(i);
-		auto &client_input = players->at(i)->client_input;
+		auto &player = players.at(i);
+		auto &client_input = players.at(i)->client_input;
 		if (client_input->requested_move)
 		{
 			player->position = client_input->target_city;
@@ -61,10 +60,10 @@ void Game::ProcessInput()
 
 void Game::Broadcast(OpcodeOut& opcode)
 {
-	for (int i = 0; i < players->size(); i++)
+	for (int i = 0; i < players.size(); i++)
 	{
-		auto &player = players->at(i);
-		OutUpdatePlayers update_players((uint8_t)players->size(), positions);
-		player->opcode_manager->Send(update_players);
+		auto &player = players.at(i);
+		
+		player->opcode_manager->Send(opcode);
 	}
 }

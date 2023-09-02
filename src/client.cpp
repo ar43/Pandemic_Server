@@ -11,6 +11,7 @@ Client::Client(SOCKET socket, randutils::mt19937_rng *rng)
 {
 	this->socket = socket;
 	this->rng = rng;
+	this->state = CSTATE_AWAITING;
 	msg_manager = std::make_shared<MsgManager>(&this->input,&this->output);
 	opcode_manager = std::make_unique<OpcodeManager>(msg_manager);
 	client_input = std::make_shared<ClientInput>();
@@ -62,7 +63,7 @@ void Client::UpdateAwaiting(uint8_t current_players, uint8_t max_players)
 
 	if (input.empty())
 		return;
-
+	spdlog::info("AWAITING");
 	if (msg_manager->ReadByte() == 14)
 	{
 		if(current_players < max_players)
@@ -116,7 +117,10 @@ void Client::Update()
 	{
 		while (msg_manager->PendingInput())
 		{
-			msg_manager->ReadDiscard(1);
+			if (msg_manager->ReadByte() == 255)
+				Drop("requested");
+			else
+				msg_manager->ReadDiscard(1);
 		}
 		timeout_counter = 0;
 	}
@@ -189,6 +193,7 @@ void Client::SendOutput()
 	while (!output.empty())
 	{
 		buffer[i] = output.front();
+		spdlog::info("SendOutput: sent %i", buffer[i]);
 		output.pop();
 		i++;
 	}
