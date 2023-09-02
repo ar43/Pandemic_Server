@@ -151,6 +151,7 @@
     <ClCompile Include="src\opcode_in.cpp" />
     <ClCompile Include="src\opcode_manager.cpp" />
     <ClCompile Include="src\opcode_out.cpp" />
+    <ClCompile Include="src\out_begin_game.cpp" />
     <ClCompile Include="src\out_message.cpp" />
     <ClCompile Include="src\out_update_players.cpp" />
     <ClCompile Include="src\server.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="src\inc\opcode_in.h" />
     <ClInclude Include="src\inc\opcode_manager.h" />
     <ClInclude Include="src\inc\opcode_out.h" />
+    <ClInclude Include="src\inc\out_begin_game.h" />
     <ClInclude Include="src\inc\out_message.h" />
     <ClInclude Include="src\inc\out_update_players.h" />
     <ClInclude Include="src\inc\server.h" />

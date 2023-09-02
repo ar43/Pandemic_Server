@@ -78,6 +78,9 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\out_begin_game.cpp">
+      <Filter>Source Files\Opcodes\Out</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\inc\server.h">
@@ -120,6 +123,9 @@
       <Filter>Header Files\Opcodes\In</Filter>
     </ClInclude>
     <ClInclude Include="src\inc\out_update_players.h">
+      <Filter>Header Files\Opcodes\Out</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\out_begin_game.h">
       <Filter>Header Files\Opcodes\Out</Filter>
     </ClInclude>
   </ItemGroup>

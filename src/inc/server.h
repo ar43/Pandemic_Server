@@ -23,6 +23,7 @@ private:
 	void ReadClientData();
 	void UpdateAwaitingClients();
 	void UpdatePlayers();
+	void UpdateGame();
 	void WriteClientData();
 	uint8_t GeneratePid();
 

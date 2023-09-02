@@ -110,6 +110,7 @@ void Server::Tick()
     ReadClientData();
     UpdateAwaitingClients();
     UpdatePlayers();
+	UpdateGame();
     WriteClientData();
 }
 
@@ -153,6 +154,11 @@ void Server::UpdatePlayers()
 		}
 	}
 
+}
+
+void Server::UpdateGame()
+{
+	game->Update();
 }
 
 void Server::ReadClientData()

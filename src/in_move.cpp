@@ -13,4 +13,5 @@ InMove::~InMove()
 void InMove::Receive(std::shared_ptr<MsgManager> const& msg_manager, std::shared_ptr<ClientInput> const& client_input)
 {
 	client_input->target_city = msg_manager->ReadByte();
+	client_input->requested_move = true;
 }

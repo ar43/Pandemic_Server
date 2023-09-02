@@ -205,7 +205,6 @@ void Client::SendOutput()
 	while (!output.empty())
 	{
 		buffer[i] = output.front();
-		spdlog::info("SendOutput: sent %i", buffer[i]);
 		output.pop();
 		i++;
 	}
