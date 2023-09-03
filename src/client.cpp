@@ -155,14 +155,14 @@ void Client::ReadInput()
 	int iResult = recv(socket, recvbuf, sizeof(recvbuf), 0);
 	if (iResult > 512)
 	{
-		spdlog::error("ReadClientData: number of bytes received is too large ({})", iResult);
+		spdlog::error("ReadInput: number of bytes received is too large ({})", iResult);
 		//closesocket(it->socket);
 	}
 	else if (iResult > 0)
 	{
 		if (!input.empty())
 			spdlog::warn("Received new buffer before previous was empty? Unexpected?");
-		spdlog::debug("ReadClientData: number of bytes received: {}", iResult);
+		//spdlog::debug("ReadInput: number of bytes received: {}", iResult);
 		//printf("Byte string:");
 		for (int i = 0; i < iResult; i++)
 		{
@@ -179,12 +179,12 @@ void Client::ReadInput()
 		{
 			return;
 		}
-		spdlog::warn("ReadClientData: recv failed with error: {}", WSAGetLastError());
+		spdlog::warn("ReadInput: recv failed with error: {}", WSAGetLastError());
 		//closesocket(socket);
 	}
 	else if (iResult == 0)
 	{
-		spdlog::info("ReadClientData: client disconnected...");
+		spdlog::info("ReadInput: client disconnected...");
 		disconnected = true;
 		//closesocket(socket);
 	}
