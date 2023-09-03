@@ -32,7 +32,7 @@ void Client::Drop(std::string reason)
 	//closesocket(socket);
 }
 
-void Client::AddToLobby()
+void Client::AddToLobby(int id)
 {
 	//static uint64_t identifier = 0;
 	//msg_manager->WriteByte(2);
@@ -40,17 +40,19 @@ void Client::AddToLobby()
 	//msg_manager->WriteByte(0);
 
 	state = CSTATE_LOBBY;
+	msg_manager->WriteByte(0);
 	//msg_manager->InitEncryption(client_session_key, server_session_key);
 	//printf("!!!!decryption: %llx %llx\n", client_session_key, server_session_key);
-	OutMessage welcome("U are in lobby");
+	std::string lobby_msg = std::string("You are in lobby(") + std::to_string(id) + std::string(")");
+	OutMessage welcome(lobby_msg);
 	opcode_manager->Send(welcome);
 	timeout_counter = 0;
 }
 
-void Client::UpdateAwaiting(uint8_t current_players, uint8_t max_players)
+int Client::UpdateAwaiting()
 {
 	if (state != CSTATE_AWAITING)
-		return;
+		return -1;
 	/*
 	if (timeout_counter >= 10)
 	{
@@ -60,28 +62,40 @@ void Client::UpdateAwaiting(uint8_t current_players, uint8_t max_players)
 	*/
 
 	timeout_counter++;
-
-	
 	
 	if (awaiting_substate == 0)
 	{
-		spdlog::info("sent 17");
-		msg_manager->WriteByte(17);
+		spdlog::info("sent 11");
+		msg_manager->WriteByte(11);
 		awaiting_substate = 1;
 	}
 	else if (awaiting_substate == 1)
 	{
 		if (!msg_manager->PendingInput())
-			return;
+			return -1;
 
-		if (msg_manager->ReadByte() == 14)
+		if (msg_manager->ReadByte() == 12)
 		{
-			spdlog::info("received 14");
-			if(current_players < max_players)
-				AddToLobby();
+			if (!msg_manager->PendingInput())
+			{
+				Drop("invalid handshake - expected lobby id");
+				return -1;
+			}
+			
+			return (int)msg_manager->ReadByte();
 		}
 	}
-	
+	else if (awaiting_substate == 2) //game full
+	{
+		msg_manager->WriteByte(1);
+		awaiting_substate = 1;
+	}
+	else if (awaiting_substate == 3) //game not found
+	{
+		msg_manager->WriteByte(2);
+		awaiting_substate = 1;
+	}
+	return -1;
 }
 
 void Client::CheckTimeout()

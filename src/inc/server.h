@@ -3,11 +3,14 @@
 #include <winsock2.h>
 #include <vector>
 #include <memory>
+#include <array>
 
 #include "randutils.hpp"
 
 class Client;
 class Game;
+
+#define MAX_GAMES 256
 
 class Server
 {
@@ -25,15 +28,18 @@ private:
 	void UpdatePlayers();
 	void UpdateGame();
 	void WriteClientData();
-	uint8_t GeneratePid();
+	void CreateGames();
+
+	int GenerateGameId();
 
 	bool running;
 	SOCKET listen_socket;
-	std::vector<std::shared_ptr<Client>> awaiting_clients;
-	std::unique_ptr<Game> game;
+	std::vector<std::unique_ptr<Client>> awaiting_clients;
+	std::vector<std::unique_ptr<Game>> games;
 
 	fd_set master_set, working_set;
 
+	std::array<bool, MAX_GAMES> taken_ids;
+
 	const int DEFAULT_PORT = 43594;
-	size_t max_players = 2;
 };

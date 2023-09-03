@@ -32,11 +32,12 @@ public:
 
 	void ReadInput();
 	void SendOutput();
+	void AddToLobby(int id);
 
 	uint8_t GetPid();
 	void SetPid(uint8_t pid);
 
-	void UpdateAwaiting(uint8_t current_players, uint8_t max_players);
+	int UpdateAwaiting();
 	void Update();
 
 	SOCKET socket;
@@ -61,6 +62,6 @@ private:
 
 	void Drop(std::string reason);
 	void RejectConnection(uint8_t code);
-	void AddToLobby();
+	
 	void CheckTimeout();
 };

@@ -6,8 +6,16 @@
 #include "out_update_players.h"
 #include "out_begin_game.h"
 
-Game::Game()
+#include <iostream>
+#include <array>
+
+Game::Game(uint8_t max_players, uint8_t id, bool auto_restart)
 {
+	this->max_players = max_players;
+	std::fill(begin(positions), end(positions), 0);
+	this->id = id;
+	this->auto_restart = auto_restart;
+	this->in_progress = false;
 }
 
 bool Game::IsInProgress()
@@ -19,7 +27,7 @@ void Game::BroadcastPositions()
 {
 	if (broadcast_positions)
 	{
-		OutUpdatePlayers update_players((uint8_t)players.size(), positions);
+		OutUpdatePlayers update_players((uint8_t)players.size(), positions.data());
 		Broadcast(update_players);
 		broadcast_positions = false;
 	}
@@ -37,19 +45,27 @@ void Game::Update()
 	time++;
 }
 
-void Game::Start()
+void Game::StartIfFull()
 {
-	in_progress = true;
-	spdlog::info("started game");
-	for (int i = 0; i < players.size(); i++)
+	if (players.size() == max_players)
 	{
-		auto &player = players.at(i);
+		in_progress = true;
+		spdlog::info("started game with id {}", GetId());
+		for (int i = 0; i < players.size(); i++)
+		{
+			auto& player = players.at(i);
 
-		player->state = CSTATE_GAME;
-		OutBeginGame out_begin_game((uint8_t)players.size(), player->GetPid());
-		player->opcode_manager->Send(out_begin_game);
-		broadcast_positions = true;
+			player->state = CSTATE_GAME;
+			OutBeginGame out_begin_game((uint8_t)players.size(), player->GetPid());
+			player->opcode_manager->Send(out_begin_game);
+			broadcast_positions = true;
+		}
 	}
+}
+
+uint8_t Game::GetId()
+{
+	return id;
 }
 
 void Game::UpdateGameState()
@@ -86,4 +102,15 @@ void Game::Broadcast(OpcodeOut& opcode)
 		
 		player->opcode_manager->Send(opcode);
 	}
+}
+
+uint8_t Game::GeneratePid()
+{
+	if (players.size() >= max_players)
+	{
+		spdlog::error("server full");
+		return 0;
+	}
+
+	return (uint8_t)players.size();
 }
