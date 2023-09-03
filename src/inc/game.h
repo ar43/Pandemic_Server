@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include <array>
+#include <string>
 
 class Client;
 class OpcodeOut;
@@ -16,9 +17,13 @@ public:
 	void BroadcastPositions();
 	void Update();
 	void StartIfFull();
+	void Kill(std::string reason);
+	bool RequestedKill();
 	uint8_t GetId();
 	uint8_t GeneratePid();
+	uint8_t GetMaxPlayers();
 	std::vector<std::unique_ptr<Client>> players;
+	bool auto_restart;
 
 private:
 	
@@ -28,7 +33,8 @@ private:
 	
 	bool in_progress = false;
 	bool broadcast_positions = false;
-	bool auto_restart;
+	bool request_kill = false;
+	
 	uint64_t time = 0;
 	std::array<uint8_t, MAX_PLAYERS> positions;
 	uint8_t id;

@@ -141,14 +141,16 @@ void Client::Update()
 	}
 	else if (state == CSTATE_LOBBY)
 	{
+		client_input->Reset();
 		while (msg_manager->PendingInput())
 		{
+			client_input->num_actions = 1;
 			if (msg_manager->ReadByte() == 255)
 				Drop("requested");
 			else
 				msg_manager->ReadDiscard(1);
 		}
-		timeout_counter = 0;
+		CheckTimeout();
 	}
 }
 

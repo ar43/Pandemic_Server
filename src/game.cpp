@@ -5,6 +5,7 @@
 #include "opcode_manager.h"
 #include "out_update_players.h"
 #include "out_begin_game.h"
+#include "out_message.h"
 
 #include <iostream>
 #include <array>
@@ -38,6 +39,12 @@ void Game::Update()
 	if (!IsInProgress())
 		return;
 
+	if (players.size() != max_players)
+	{
+		Kill("player disconnected");
+		return;
+	}
+
 	ProcessInput();
 	UpdateGameState();
 	BroadcastPositions();
@@ -61,6 +68,19 @@ void Game::StartIfFull()
 			broadcast_positions = true;
 		}
 	}
+}
+
+bool Game::RequestedKill()
+{
+	return request_kill;
+}
+
+void Game::Kill(std::string reason)
+{
+	request_kill = true;
+	std::string str = std::string("Game killed - reason: ") + reason;
+	OutMessage msg(str);
+	Broadcast(msg);
 }
 
 uint8_t Game::GetId()
@@ -113,4 +133,9 @@ uint8_t Game::GeneratePid()
 	}
 
 	return (uint8_t)players.size();
+}
+
+uint8_t Game::GetMaxPlayers()
+{
+	return max_players;
 }

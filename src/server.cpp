@@ -28,19 +28,6 @@ Server::Server()
 	std::fill(begin(taken_ids), end(taken_ids), false);
 }
 
-void Server::CreateGames()
-{
-	auto game0 = std::make_unique<Game>(1, GenerateGameId(), true);
-	auto game1 = std::make_unique<Game>(2, GenerateGameId(), true);
-	auto game2 = std::make_unique<Game>(3, GenerateGameId(), true);
-	auto game3 = std::make_unique<Game>(4, GenerateGameId(), true);
-
-	games.push_back(std::move(game0));
-	games.push_back(std::move(game1));
-	games.push_back(std::move(game2));
-	games.push_back(std::move(game3));
-}
-
 int Server::GenerateGameId()
 {
 	for (int i = 0; i < taken_ids.size(); i++)
@@ -117,7 +104,7 @@ bool Server::Init()
         return false;
     }
 
-	CreateGames();
+	QueueInitialGames();
 
     return true;
     //FD_ZERO(&master_set);
@@ -136,6 +123,7 @@ void Server::Run()
 
 void Server::Tick()
 {
+	CreateQueuedGames();
     AcceptNewConnections();
     ReadClientData();
     UpdateAwaitingClients();
@@ -160,11 +148,6 @@ void Server::UpdatePlayers()
 {
 	for (auto& game : games)
 	{
-		for (auto& it : game->players)
-		{
-			it->Update();
-		}
-
 		for (auto it = game->players.begin(); it != game->players.end();)
 		{
 			if ((*it)->dropped)
@@ -179,11 +162,32 @@ void Server::UpdatePlayers()
 				it++;
 			}
 		}
+
+		for (auto& it : game->players)
+		{
+			it->Update();
+		}
 	}
 }
 
 void Server::UpdateGame()
 {
+	for (auto it = games.begin(); it != games.end();)
+	{
+		if ((*it)->RequestedKill())
+		{
+			if ((*it)->auto_restart)
+			{
+				game_creation_queue.push(std::make_unique<Game>((*it)->GetMaxPlayers(), (*it)->GetId(), true));
+			}
+			
+			it = games.erase(it);
+		}
+		else
+		{
+			it++;
+		}
+	}
 	for (auto& game : games)
 	{
 		game->Update();
@@ -265,4 +269,27 @@ void Server::WriteClientData()
 			it->SendOutput();
 		}
 	}
+}
+
+void Server::CreateQueuedGames()
+{
+	while (!game_creation_queue.empty())
+	{
+		spdlog::info("game created");
+		games.push_back(std::move(game_creation_queue.front()));
+		game_creation_queue.pop();
+	}
+}
+
+void Server::QueueInitialGames()
+{
+	auto game0 = std::make_unique<Game>(1, GenerateGameId(), true);
+	auto game1 = std::make_unique<Game>(2, GenerateGameId(), true);
+	auto game2 = std::make_unique<Game>(3, GenerateGameId(), true);
+	auto game3 = std::make_unique<Game>(4, GenerateGameId(), true);
+
+	game_creation_queue.push(std::move(game0));
+	game_creation_queue.push(std::move(game1));
+	game_creation_queue.push(std::move(game2));
+	game_creation_queue.push(std::move(game3));
 }

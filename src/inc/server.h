@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <array>
+#include <queue>
 
 #include "randutils.hpp"
 
@@ -28,7 +29,8 @@ private:
 	void UpdatePlayers();
 	void UpdateGame();
 	void WriteClientData();
-	void CreateGames();
+	void CreateQueuedGames();
+	void QueueInitialGames();
 
 	int GenerateGameId();
 
@@ -36,6 +38,8 @@ private:
 	SOCKET listen_socket;
 	std::vector<std::unique_ptr<Client>> awaiting_clients;
 	std::vector<std::unique_ptr<Game>> games;
+
+	std::queue<std::unique_ptr<Game>> game_creation_queue;
 
 	fd_set master_set, working_set;
 
