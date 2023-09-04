@@ -5,7 +5,7 @@
 #include "opcode_manager.h"
 #include "out_update_players.h"
 #include "out_begin_game.h"
-#include "out_message.h"
+#include "out_server_message.h"
 
 #include <iostream>
 #include <array>
@@ -79,7 +79,7 @@ void Game::Kill(std::string reason)
 {
 	request_kill = true;
 	std::string str = std::string("Game killed - reason: ") + reason;
-	OutMessage msg(str);
+	OutServerMessage msg(ServerMessageType::SMESSAGE_INFO, str);
 	Broadcast(msg);
 }
 

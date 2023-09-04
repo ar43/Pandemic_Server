@@ -5,7 +5,7 @@
 #include "utility.h"
 #include "client_input.h"
 
-#include "out_message.h"
+#include "out_server_message.h"
 
 Client::Client(SOCKET socket, randutils::mt19937_rng *rng)
 {
@@ -44,7 +44,7 @@ void Client::AddToLobby(int id)
 	//msg_manager->InitEncryption(client_session_key, server_session_key);
 	//printf("!!!!decryption: %llx %llx\n", client_session_key, server_session_key);
 	std::string lobby_msg = std::string("You are in lobby(") + std::to_string(id) + std::string(")");
-	OutMessage welcome(lobby_msg);
+	OutServerMessage welcome(ServerMessageType::SMESSAGE_INFO, lobby_msg);
 	opcode_manager->Send(welcome);
 	timeout_counter = 0;
 }
@@ -130,7 +130,7 @@ void Client::Update()
 
 		if (time == 0)
 		{
-			OutMessage welcome("U are in game\n");
+			OutServerMessage welcome(ServerMessageType::SMESSAGE_INFO, "U are in game\n");
 			opcode_manager->Send(welcome);
 
 			//OpShowInterface design(3559);
