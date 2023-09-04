@@ -16,5 +16,6 @@ void ClientInput::Reset()
 	invalid_opcode = false;
 	requested_move = false;
 	target_city = 0;
+	client_message = nullptr;
 }
 

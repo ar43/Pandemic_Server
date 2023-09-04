@@ -7,6 +7,7 @@
 #include "in_idle.h"
 #include "in_error.h"
 #include "in_move.h"
+#include "in_client_message.h"
 
 OpcodeManager::OpcodeManager(std::shared_ptr<MsgManager> msg_manager)
 {
@@ -45,6 +46,7 @@ std::unique_ptr<OpcodeIn> OpcodeManager::GetOpcode(uint8_t id)
 	{
 		case 0: return std::make_unique<InIdle>();
 		case 1: return std::make_unique<InMove>();
+		case 2: return std::make_unique<InClientMessage>();
 		default: return std::make_unique<InError>();
 
 	}

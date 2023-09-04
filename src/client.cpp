@@ -34,15 +34,8 @@ void Client::Drop(std::string reason)
 
 void Client::AddToLobby(int id)
 {
-	//static uint64_t identifier = 0;
-	//msg_manager->WriteByte(2);
-	//msg_manager->WriteByte(0);
-	//msg_manager->WriteByte(0);
-
 	state = CSTATE_LOBBY;
 	msg_manager->WriteByte(0);
-	//msg_manager->InitEncryption(client_session_key, server_session_key);
-	//printf("!!!!decryption: %llx %llx\n", client_session_key, server_session_key);
 	std::string lobby_msg = std::string("You are in lobby(") + std::to_string(id) + std::string(")");
 	OutServerMessage welcome(ServerMessageType::SMESSAGE_INFO, lobby_msg);
 	opcode_manager->Send(welcome);
@@ -130,7 +123,7 @@ void Client::Update()
 
 		if (time == 0)
 		{
-			OutServerMessage welcome(ServerMessageType::SMESSAGE_INFO, "U are in game\n");
+			OutServerMessage welcome(ServerMessageType::SMESSAGE_INFO, "U are in game");
 			opcode_manager->Send(welcome);
 
 			//OpShowInterface design(3559);

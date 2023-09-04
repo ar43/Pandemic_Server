@@ -6,6 +6,7 @@
 #include "out_update_players.h"
 #include "out_begin_game.h"
 #include "out_server_message.h"
+#include "client_message_type.h"
 
 #include <iostream>
 #include <array>
@@ -110,6 +111,18 @@ void Game::ProcessInput()
 			broadcast_positions = true;
 			player->position = client_input->target_city;
 			client_input->requested_move = false;
+		}
+		if (client_input->client_message != nullptr)
+		{
+			if (client_input->client_message->first == ClientMessageType::CMESSAGE_CHAT)
+			{
+				std::string msg = std::to_string(player->GetPid()) + std::string(": ") + client_input->client_message->second;
+				//msg.erase(std::remove(msg.begin(), msg.end(), '\n'), msg.cend());
+				OutServerMessage chat_msg(ServerMessageType::SMESSAGE_CHAT, msg);
+				Broadcast(chat_msg);
+				client_input->client_message = nullptr;
+			}
+			
 		}
 	}
 }

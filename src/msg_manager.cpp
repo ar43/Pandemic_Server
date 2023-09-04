@@ -61,7 +61,7 @@ uint64_t MsgManager::ReadLong()
 	return (a << 32) + b;
 }
 
-std::string MsgManager::ReadString(uint8_t length)
+std::string MsgManager::ReadString(uint16_t length)
 {
 	std::string str = "";
 	for (int i = 0; i < length; i++)

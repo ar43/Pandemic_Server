@@ -1,5 +1,10 @@
 #pragma once
 #include <deque>
+#include <utility>
+#include <string>
+#include <memory>
+
+#include "client_message_type.h"
 
 struct Position;
 
@@ -12,6 +17,8 @@ struct ClientInput
 public:
 	bool requested_move = false;
 	uint8_t target_city = 0;
+
+	std::unique_ptr<std::pair<ClientMessageType, std::string>> client_message;
 
 
 	int num_actions;

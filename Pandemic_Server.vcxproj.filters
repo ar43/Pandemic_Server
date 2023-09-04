@@ -84,6 +84,9 @@
     <ClCompile Include="src\out_begin_game.cpp">
       <Filter>Source Files\Opcodes\Out</Filter>
     </ClCompile>
+    <ClCompile Include="src\in_client_message.cpp">
+      <Filter>Source Files\Opcodes\In</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\inc\server.h">
@@ -133,6 +136,12 @@
     </ClInclude>
     <ClInclude Include="src\inc\server_message_type.h">
       <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\client_message_type.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\in_client_message.h">
+      <Filter>Header Files\Opcodes\In</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
