@@ -138,7 +138,7 @@ void Server::AcceptNewConnections()
     new_socket = accept(listen_socket, NULL, NULL);
     if (new_socket != INVALID_SOCKET) 
     {
-        auto new_client = std::make_unique<Client>(new_socket,&rng);
+        auto new_client = std::make_unique<Client>(new_socket);
         awaiting_clients.push_back(std::move(new_client));
         spdlog::info("AcceptNewConnections: new client connected");
     }

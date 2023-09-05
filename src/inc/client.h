@@ -16,7 +16,7 @@ struct ClientInput;
 class Client
 {
 public:
-	Client(SOCKET socket, randutils::mt19937_rng *rng);
+	Client(SOCKET socket);
 	~Client();
 
 	std::shared_ptr<MsgManager> msg_manager;
@@ -47,8 +47,7 @@ private:
 	uint64_t time = 0;
 	int timeout_counter = 0;
 	uint8_t pid;
-	bool sent_welcome_message = false;
-	randutils::mt19937_rng *rng = nullptr;
+	randutils::mt19937_rng rng;
 	uint32_t current_region = 0;
 
 	std::queue<char> input;

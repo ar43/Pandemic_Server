@@ -7,10 +7,9 @@
 
 #include "out_server_message.h"
 
-Client::Client(SOCKET socket, randutils::mt19937_rng *rng)
+Client::Client(SOCKET socket)
 {
 	this->socket = socket;
-	this->rng = rng;
 	this->state = ClientState::CSTATE_AWAITING;
 	msg_manager = std::make_shared<MsgManager>(&this->input,&this->output);
 	opcode_manager = std::make_unique<OpcodeManager>(msg_manager);
@@ -165,7 +164,7 @@ void Client::ReadInput()
 		return;
 	char recvbuf[Client::MAX_PACKET_SIZE] = { 0 };
 	int iResult = recv(socket, recvbuf, sizeof(recvbuf), 0);
-	if (iResult > Client::MAX_PACKET_SIZE)
+	if (iResult > (int)Client::MAX_PACKET_SIZE)
 	{
 		spdlog::error("ReadInput: number of bytes received is too large ({})", iResult);
 		//closesocket(it->socket);

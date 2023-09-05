@@ -4,6 +4,8 @@
 #include <array>
 #include <string>
 
+#include "randutils.hpp"
+
 class Client;
 class OpcodeOut;
 
@@ -38,6 +40,7 @@ private:
 	uint64_t time = 0;
 	std::array<uint8_t, MAX_PLAYERS> positions;
 	uint8_t id;
+	randutils::mt19937_rng rng;
 
 	uint8_t max_players;
 };
