@@ -143,5 +143,8 @@
     <ClInclude Include="src\inc\in_client_message.h">
       <Filter>Header Files\Opcodes\In</Filter>
     </ClInclude>
+    <ClInclude Include="src\inc\client_state.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

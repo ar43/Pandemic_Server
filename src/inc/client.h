@@ -5,20 +5,13 @@
 #include <assert.h>
 #include <memory>
 #include "randutils.hpp"
+#include "client_state.h"
 
 //class Encryption;
 
 class MsgManager;
 class OpcodeManager;
 struct ClientInput;
-
-enum ClientState
-{
-	CSTATE_UNCONNECTED, //unused server-side
-	CSTATE_AWAITING,
-	CSTATE_LOBBY,
-	CSTATE_GAME
-};
 
 class Client
 {
@@ -50,6 +43,7 @@ public:
 	uint8_t position = 0;
 
 private:
+	static const size_t MAX_PACKET_SIZE = 1024;
 	uint64_t time = 0;
 	int timeout_counter = 0;
 	uint8_t pid;

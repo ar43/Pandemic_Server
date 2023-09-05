@@ -89,6 +89,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -162,6 +163,7 @@
     <ClInclude Include="src\inc\client.h" />
     <ClInclude Include="src\inc\client_input.h" />
     <ClInclude Include="src\inc\client_message_type.h" />
+    <ClInclude Include="src\inc\client_state.h" />
     <ClInclude Include="src\inc\game.h" />
     <ClInclude Include="src\inc\in_client_message.h" />
     <ClInclude Include="src\inc\in_error.h" />

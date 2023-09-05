@@ -28,7 +28,8 @@ uint8_t MsgManager::ReadByte()
 	}
 	else
 	{
-		spdlog::error("MsgManager::ReadByte: underflow");
+		spdlog::warn("MsgManager::ReadByte: underflow");
+		error = true;
 		return 0;
 	}
 }
@@ -189,4 +190,9 @@ uint8_t MsgManager::BitstreamGetNextByte()
 		value |= (next_bit << (7-i));
 	}
 	return value;
+}
+
+bool MsgManager::GetError()
+{
+	return error;
 }

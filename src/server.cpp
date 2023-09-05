@@ -30,7 +30,7 @@ Server::Server()
 
 int Server::GenerateGameId()
 {
-	for (int i = 0; i < taken_ids.size(); i++)
+	for (size_t i = 0; i < taken_ids.size(); i++)
 	{
 		if (taken_ids[i] == false)
 		{
@@ -152,7 +152,7 @@ void Server::UpdatePlayers()
 		{
 			if ((*it)->dropped)
 			{
-				if((*it)->state == CSTATE_GAME)
+				if((*it)->state == ClientState::CSTATE_GAME)
 					spdlog::warn("dropped client {} while ingame", (*it)->GetPid());
 				closesocket((*it)->socket);
 				it = game->players.erase(it);

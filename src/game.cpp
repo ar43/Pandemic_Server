@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <array>
+#include <format>
 
 Game::Game(uint8_t max_players, uint8_t id, bool auto_restart)
 {
@@ -59,11 +60,9 @@ void Game::StartIfFull()
 	{
 		in_progress = true;
 		spdlog::info("started game with id {}", GetId());
-		for (int i = 0; i < players.size(); i++)
+		for (auto& player : players)
 		{
-			auto& player = players.at(i);
-
-			player->state = CSTATE_GAME;
+			player->state = ClientState::CSTATE_GAME;
 			OutBeginGame out_begin_game((uint8_t)players.size(), player->GetPid());
 			player->opcode_manager->Send(out_begin_game);
 			broadcast_positions = true;
@@ -91,20 +90,17 @@ uint8_t Game::GetId()
 
 void Game::UpdateGameState()
 {
-	for (int i = 0; i < players.size(); i++)
+	for (auto& player : players)
 	{
-		auto &player = players.at(i);
-		
 		positions[player->GetPid()] = player->position;
 	}
 }
 
 void Game::ProcessInput()
 {
-	for (int i = 0; i < players.size(); i++)
+	for (auto& player : players)
 	{
-		auto &player = players.at(i);
-		auto &client_input = players.at(i)->client_input;
+		auto &client_input = player->client_input;
 		if (client_input->requested_move)
 		{
 			spdlog::info("a player requested to move");
@@ -129,10 +125,8 @@ void Game::ProcessInput()
 
 void Game::Broadcast(OpcodeOut& opcode)
 {
-	for (int i = 0; i < players.size(); i++)
+	for (auto& player : players)
 	{
-		auto &player = players.at(i);
-		
 		player->opcode_manager->Send(opcode);
 	}
 }

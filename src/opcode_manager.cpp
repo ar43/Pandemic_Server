@@ -21,7 +21,7 @@ void OpcodeManager::Send(OpcodeOut & opcode)
 	opcode.Send(msg_manager);
 }
 
-void OpcodeManager::Receive(std::shared_ptr<ClientInput> const& client_input, uint8_t pid)
+bool OpcodeManager::Receive(std::shared_ptr<ClientInput> const& client_input, uint8_t pid)
 {
 	while (msg_manager->PendingInput())
 	{
@@ -32,12 +32,18 @@ void OpcodeManager::Receive(std::shared_ptr<ClientInput> const& client_input, ui
 			spdlog::info("client({}): opcode {} - pnum: {}", pid, opcode_id, client_input->num_actions);
 		if (client_input->invalid_opcode)
 		{
-			spdlog::warn("opcode {} was invalid/unimplemented", opcode_id);
-			return;
+			spdlog::warn("client opcode {} - invalid opcode", opcode_id);
+			return false;
+		}
+		if (msg_manager->GetError())
+		{
+			spdlog::warn("client opcode {} - malformed packet - caused ReadByte underflow", opcode_id);
+			return false;
 		}
 			
 		client_input->num_actions++;
 	}
+	return true;
 }
 
 std::unique_ptr<OpcodeIn> OpcodeManager::GetOpcode(uint8_t id)

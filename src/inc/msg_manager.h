@@ -34,10 +34,14 @@ public:
 
 	bool PendingInput();
 	uint8_t BitstreamGetNextByte();
+
+	bool GetError();
 private:
 	//std::unique_ptr<Encryption> packetEncryption;
 	//std::unique_ptr<Encryption> packetDecryption;
 	std::queue<char> bit_queue;
 	std::queue<char> *input;
 	std::queue<char> *output;
+	
+	bool error = false;
 };

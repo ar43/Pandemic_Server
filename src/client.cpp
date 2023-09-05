@@ -11,7 +11,7 @@ Client::Client(SOCKET socket, randutils::mt19937_rng *rng)
 {
 	this->socket = socket;
 	this->rng = rng;
-	this->state = CSTATE_AWAITING;
+	this->state = ClientState::CSTATE_AWAITING;
 	msg_manager = std::make_shared<MsgManager>(&this->input,&this->output);
 	opcode_manager = std::make_unique<OpcodeManager>(msg_manager);
 	client_input = std::make_shared<ClientInput>();
@@ -25,7 +25,9 @@ Client::~Client()
 void Client::Drop(std::string reason)
 {
 	dropped = true;
-	if(state == CSTATE_LOBBY || state == CSTATE_GAME)
+	OutServerMessage msg(ServerMessageType::SMESSAGE_INFO, std::format("Dropped. Reason: {}",reason));
+	opcode_manager->Send(msg);
+	if(state == ClientState::CSTATE_LOBBY || state == ClientState::CSTATE_GAME)
 		spdlog::info("dropped client (pid: {}) (reason: {})",pid, reason);
 	else
 		spdlog::info("dropped unconnected client (reason: {})", reason);
@@ -34,7 +36,7 @@ void Client::Drop(std::string reason)
 
 void Client::AddToLobby(int id)
 {
-	state = CSTATE_LOBBY;
+	state = ClientState::CSTATE_LOBBY;
 	msg_manager->WriteByte(0);
 	std::string lobby_msg = std::string("You are in lobby(") + std::to_string(id) + std::string(")");
 	OutServerMessage welcome(ServerMessageType::SMESSAGE_INFO, lobby_msg);
@@ -44,7 +46,7 @@ void Client::AddToLobby(int id)
 
 int Client::UpdateAwaiting()
 {
-	if (state != CSTATE_AWAITING)
+	if (state != ClientState::CSTATE_AWAITING)
 		return -1;
 	/*
 	if (timeout_counter >= 10)
@@ -110,14 +112,15 @@ void Client::CheckTimeout()
 
 void Client::Update()
 {
-	if (state == CSTATE_GAME)
+	if (state == ClientState::CSTATE_GAME)
 	{
 		client_input->Reset();
 
-		opcode_manager->Receive(client_input, pid);
-
-		if (client_input->invalid_opcode)
-			return Drop("invalid opcode");
+		auto success = opcode_manager->Receive(client_input, pid);
+		if (!success)
+		{
+			return Drop("opcode error");
+		}
 
 		CheckTimeout();
 
@@ -132,7 +135,7 @@ void Client::Update()
 
 		time++;
 	}
-	else if (state == CSTATE_LOBBY)
+	else if (state == ClientState::CSTATE_LOBBY)
 	{
 		client_input->Reset();
 		while (msg_manager->PendingInput())
@@ -160,9 +163,9 @@ void Client::ReadInput()
 {
 	if (dropped || disconnected)
 		return;
-	char recvbuf[512] = { 0 };
+	char recvbuf[Client::MAX_PACKET_SIZE] = { 0 };
 	int iResult = recv(socket, recvbuf, sizeof(recvbuf), 0);
-	if (iResult > 512)
+	if (iResult > Client::MAX_PACKET_SIZE)
 	{
 		spdlog::error("ReadInput: number of bytes received is too large ({})", iResult);
 		//closesocket(it->socket);
@@ -203,13 +206,12 @@ void Client::SendOutput()
 {
 	if (dropped || disconnected || output.empty())
 		return;
-	char buffer[512];
+	char buffer[Client::MAX_PACKET_SIZE];
 	int size = (int)output.size();
 	int i = 0;
-	if (output.size() > 512)
+	if (output.size() > Client::MAX_PACKET_SIZE)
 	{
 		spdlog::error("SendOutput: too large");
-		exit(1);
 	}
 	while (!output.empty())
 	{
