@@ -7,6 +7,8 @@
 #include "out_begin_game.h"
 #include "out_server_message.h"
 #include "client_message_type.h"
+#include "nlohmann/json.hpp"
+#include "map.h"
 
 #include <iostream>
 #include <array>
@@ -19,6 +21,10 @@ Game::Game(uint8_t max_players, uint8_t id, bool auto_restart)
 	this->id = id;
 	this->auto_restart = auto_restart;
 	this->in_progress = false;
+}
+
+Game::~Game()
+{
 }
 
 bool Game::IsInProgress()
@@ -59,6 +65,7 @@ void Game::StartIfFull()
 	if (players.size() == max_players)
 	{
 		in_progress = true;
+		LoadMap("map_default.json");
 		spdlog::info("started game with id {}", GetId());
 		for (auto& player : players)
 		{
@@ -83,6 +90,12 @@ void Game::Kill(std::string reason)
 	Broadcast(msg);
 }
 
+bool Game::LoadMap(std::string map_name)
+{
+	current_map = std::make_unique<Map>(map_name);
+	return true;
+}
+
 uint8_t Game::GetId()
 {
 	return id;
@@ -103,9 +116,12 @@ void Game::ProcessInput()
 		auto &client_input = player->client_input;
 		if (client_input->requested_move)
 		{
-			spdlog::info("a player requested to move");
-			broadcast_positions = true;
-			player->position = client_input->target_city;
+			if (current_map->IsCityNeighbour(player->position, client_input->target_city))
+			{
+				spdlog::info("a player requested to move");
+				broadcast_positions = true;
+				player->position = client_input->target_city;
+			}
 			client_input->requested_move = false;
 		}
 		if (client_input->client_message != nullptr)

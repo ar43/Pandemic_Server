@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\city.cpp" />
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\client_input.cpp" />
     <ClCompile Include="src\game.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="src\in_idle.cpp" />
     <ClCompile Include="src\in_move.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\map.cpp" />
     <ClCompile Include="src\msg_manager.cpp" />
     <ClCompile Include="src\opcode_in.cpp" />
     <ClCompile Include="src\opcode_manager.cpp" />
@@ -160,6 +162,7 @@
     <ClCompile Include="src\utility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\inc\city.h" />
     <ClInclude Include="src\inc\client.h" />
     <ClInclude Include="src\inc\client_input.h" />
     <ClInclude Include="src\inc\client_message_type.h" />
@@ -169,6 +172,7 @@
     <ClInclude Include="src\inc\in_error.h" />
     <ClInclude Include="src\inc\in_idle.h" />
     <ClInclude Include="src\inc\in_move.h" />
+    <ClInclude Include="src\inc\map.h" />
     <ClInclude Include="src\inc\msg_manager.h" />
     <ClInclude Include="src\inc\opcode_in.h" />
     <ClInclude Include="src\inc\opcode_manager.h" />

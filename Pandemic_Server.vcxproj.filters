@@ -34,12 +34,15 @@
     <Filter Include="Header Files\Enums">
       <UniqueIdentifier>{c20b5e18-bc5a-450b-873e-d52cc3929c44}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Game">
+      <UniqueIdentifier>{298e7ae0-5a7c-4dd4-b399-ce03f0c943ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game">
+      <UniqueIdentifier>{481a9630-f2dc-41e4-874c-aa11255fe9a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client.cpp">
@@ -87,12 +90,18 @@
     <ClCompile Include="src\in_client_message.cpp">
       <Filter>Source Files\Opcodes\In</Filter>
     </ClCompile>
+    <ClCompile Include="src\game.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\map.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\city.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\inc\server.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\inc\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\inc\client.h">
@@ -145,6 +154,15 @@
     </ClInclude>
     <ClInclude Include="src\inc\client_state.h">
       <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\game.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\city.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\map.h">
+      <Filter>Header Files\Game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

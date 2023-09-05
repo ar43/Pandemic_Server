@@ -8,6 +8,7 @@
 
 class Client;
 class OpcodeOut;
+class Map;
 
 #define MAX_PLAYERS 4
 
@@ -15,11 +16,13 @@ class Game
 {
 public:
 	Game(uint8_t max_players, uint8_t id, bool auto_restart);
+	~Game();
 	bool IsInProgress();
 	void BroadcastPositions();
 	void Update();
 	void StartIfFull();
 	void Kill(std::string reason);
+	bool LoadMap(std::string map_name);
 	bool RequestedKill();
 	uint8_t GetId();
 	uint8_t GeneratePid();
@@ -43,4 +46,6 @@ private:
 	randutils::mt19937_rng rng;
 
 	uint8_t max_players;
+
+	std::unique_ptr<Map> current_map;
 };
