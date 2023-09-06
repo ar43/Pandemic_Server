@@ -11,6 +11,7 @@
 
 class MsgManager;
 class OpcodeManager;
+class PlayerInfo;
 struct ClientInput;
 
 class Client
@@ -22,6 +23,8 @@ public:
 	std::shared_ptr<MsgManager> msg_manager;
 	std::unique_ptr<OpcodeManager> opcode_manager;
 	std::shared_ptr<ClientInput> client_input;
+
+	std::unique_ptr<PlayerInfo> player_info;
 
 	void ReadInput();
 	void SendOutput();
@@ -40,10 +43,9 @@ public:
 	bool dropped = false;
 	bool disconnected = false;
 
-	uint8_t position = 0;
-
 private:
 	static const size_t MAX_PACKET_SIZE = 1024;
+	static const uint8_t MAX_NAME_LEN = 29;
 	uint64_t time = 0;
 	int timeout_counter = 0;
 	uint8_t pid;

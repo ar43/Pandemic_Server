@@ -35,6 +35,8 @@ private:
 	void UpdateGameState();
 	void ProcessInput();
 	void Broadcast(OpcodeOut& opcode);
+	void GenerateRoles();
+	void ValidateNames();
 	
 	bool in_progress = false;
 	bool broadcast_positions = false;

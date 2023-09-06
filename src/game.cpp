@@ -9,6 +9,8 @@
 #include "client_message_type.h"
 #include "nlohmann/json.hpp"
 #include "map.h"
+#include "player_role.h"
+#include "player_info.h"
 
 #include <iostream>
 #include <array>
@@ -60,6 +62,45 @@ void Game::Update()
 	time++;
 }
 
+void Game::GenerateRoles()
+{
+	std::vector<PlayerRole> role_list;
+	for (int i = 0; i < (int)PlayerRole::NUM_ROLES; i++)
+	{
+		role_list.push_back((PlayerRole)i);
+	}
+
+	for (auto& player : players)
+	{
+		auto num = rng.uniform(0, (int)role_list.size()-1);
+		if (num < 0 || num >(int)PlayerRole::NUM_ROLES)
+		{
+			spdlog::error("fix GenerateRoles");
+			exit(1);
+		}
+
+		player->player_info->SetRole((PlayerRole)num);
+		role_list.erase(role_list.begin()+num);
+	}
+}
+
+void Game::ValidateNames()
+{
+	std::vector<std::string> names;
+	for (auto& player : players)
+	{
+		auto player_name = player->player_info->GetName();
+		for (auto name : names)
+		{
+			if (player_name == name)
+			{
+				player->player_info->SetName(std::format("{}({})", player_name, player->GetPid()));
+			}
+		}
+		names.push_back(player_name);
+	}
+}
+
 void Game::StartIfFull()
 {
 	if (players.size() == max_players)
@@ -67,13 +108,24 @@ void Game::StartIfFull()
 		in_progress = true;
 		LoadMap("map_default.json");
 		spdlog::info("started game with id {}", GetId());
+		GenerateRoles();
+		ValidateNames();
+		std::vector<std::string> player_names;
+		std::vector<PlayerRole> player_roles;
 		for (auto& player : players)
 		{
+			player->player_info->SetActions(0);
 			player->state = ClientState::CSTATE_GAME;
-			OutBeginGame out_begin_game((uint8_t)players.size(), player->GetPid());
-			player->opcode_manager->Send(out_begin_game);
-			broadcast_positions = true;
+			player_names.push_back(player->player_info->GetName());
+			player_roles.push_back(player->player_info->GetRole());
 		}
+		for (auto& player : players)
+		{
+			OutBeginGame out_begin_game((uint8_t)players.size(), player->GetPid(),&player_names,&player_roles);
+			player->opcode_manager->Send(out_begin_game);
+		}
+		
+		broadcast_positions = true;
 	}
 }
 
@@ -105,7 +157,7 @@ void Game::UpdateGameState()
 {
 	for (auto& player : players)
 	{
-		positions[player->GetPid()] = player->position;
+		positions[player->GetPid()] = player->player_info->GetPosition();
 	}
 }
 
@@ -116,11 +168,12 @@ void Game::ProcessInput()
 		auto &client_input = player->client_input;
 		if (client_input->requested_move)
 		{
-			if (current_map->IsCityNeighbour(player->position, client_input->target_city))
+			if (current_map->IsCityNeighbour(player->player_info->GetPosition(), client_input->target_city) && player->player_info->GetActions() > 0)
 			{
 				spdlog::info("a player requested to move");
 				broadcast_positions = true;
-				player->position = client_input->target_city;
+				player->player_info->SetPosition(client_input->target_city);
+				player->player_info->SetActions(player->player_info->GetActions() - 1);
 			}
 			client_input->requested_move = false;
 		}
@@ -128,8 +181,7 @@ void Game::ProcessInput()
 		{
 			if (client_input->client_message->first == ClientMessageType::CMESSAGE_CHAT)
 			{
-				std::string msg = std::to_string(player->GetPid()) + std::string(": ") + client_input->client_message->second;
-				//msg.erase(std::remove(msg.begin(), msg.end(), '\n'), msg.cend());
+				std::string msg = player->player_info->GetName() + std::string(": ") + client_input->client_message->second;
 				OutServerMessage chat_msg(ServerMessageType::SMESSAGE_CHAT, msg);
 				Broadcast(chat_msg);
 				client_input->client_message = nullptr;

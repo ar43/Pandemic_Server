@@ -12,7 +12,6 @@ using json = nlohmann::json;
 Map::Map(std::string map_name)
 {
 	std::string full_path = std::format("assets/maps/{}", map_name);
-	std::ofstream output("test.txt");
 	std::ifstream f(full_path);
 	std::string line;
 	while (std::getline(f, line))
@@ -23,8 +22,6 @@ Map::Map(std::string map_name)
 		std::vector<int> neighbours = data["_neighbourIds"];
 		this->cities[(int)data["_id"]] = std::make_unique<City>(id, name, neighbours);
 	}
-	
-	
 }
 
 Map::~Map()

@@ -6,6 +6,7 @@
 #include "client_input.h"
 
 #include "out_server_message.h"
+#include "player_info.h"
 
 Client::Client(SOCKET socket)
 {
@@ -14,6 +15,7 @@ Client::Client(SOCKET socket)
 	msg_manager = std::make_shared<MsgManager>(&this->input,&this->output);
 	opcode_manager = std::make_unique<OpcodeManager>(msg_manager);
 	client_input = std::make_shared<ClientInput>();
+	player_info = std::make_unique<PlayerInfo>();
 }
 
 Client::~Client()
@@ -70,13 +72,17 @@ int Client::UpdateAwaiting()
 
 		if (msg_manager->ReadByte() == 12)
 		{
-			if (!msg_manager->PendingInput())
+			auto lobby_id = (int)msg_manager->ReadByte();
+			auto name_length = msg_manager->ReadByte();
+			if (name_length > Client::MAX_NAME_LEN || name_length < 3)
 			{
-				Drop("invalid handshake - expected lobby id");
+				Drop("invalid name length");
 				return -1;
 			}
+			std::string name = msg_manager->ReadString(name_length);
+			player_info->SetName(name);
 			
-			return (int)msg_manager->ReadByte();
+			return lobby_id;
 		}
 	}
 	else if (awaiting_substate == 2) //game full
@@ -125,7 +131,7 @@ void Client::Update()
 
 		if (time == 0)
 		{
-			OutServerMessage welcome(ServerMessageType::SMESSAGE_INFO, "U are in game");
+			OutServerMessage welcome(ServerMessageType::SMESSAGE_INFO, "Game started!");
 			opcode_manager->Send(welcome);
 
 			//OpShowInterface design(3559);

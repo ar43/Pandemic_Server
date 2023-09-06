@@ -158,6 +158,7 @@
     <ClCompile Include="src\out_begin_game.cpp" />
     <ClCompile Include="src\out_server_message.cpp" />
     <ClCompile Include="src\out_update_players.cpp" />
+    <ClCompile Include="src\player_info.cpp" />
     <ClCompile Include="src\server.cpp" />
     <ClCompile Include="src\utility.cpp" />
   </ItemGroup>
@@ -180,6 +181,8 @@
     <ClInclude Include="src\inc\out_begin_game.h" />
     <ClInclude Include="src\inc\out_server_message.h" />
     <ClInclude Include="src\inc\out_update_players.h" />
+    <ClInclude Include="src\inc\player_info.h" />
+    <ClInclude Include="src\inc\player_role.h" />
     <ClInclude Include="src\inc\server.h" />
     <ClInclude Include="src\inc\server_message_type.h" />
     <ClInclude Include="src\inc\utility.h" />
