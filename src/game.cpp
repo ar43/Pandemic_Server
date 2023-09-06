@@ -79,7 +79,7 @@ void Game::GenerateRoles()
 			exit(1);
 		}
 
-		player->player_info->SetRole((PlayerRole)num);
+		player->player_info->SetRole((PlayerRole)role_list.at(num));
 		role_list.erase(role_list.begin()+num);
 	}
 }
