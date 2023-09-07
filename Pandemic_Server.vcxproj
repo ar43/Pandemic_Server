@@ -160,6 +160,7 @@
     <ClCompile Include="src\out_update_players.cpp" />
     <ClCompile Include="src\player_info.cpp" />
     <ClCompile Include="src\server.cpp" />
+    <ClCompile Include="src\timer.cpp" />
     <ClCompile Include="src\utility.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +186,7 @@
     <ClInclude Include="src\inc\player_role.h" />
     <ClInclude Include="src\inc\server.h" />
     <ClInclude Include="src\inc\server_message_type.h" />
+    <ClInclude Include="src\inc\timer.h" />
     <ClInclude Include="src\inc\utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

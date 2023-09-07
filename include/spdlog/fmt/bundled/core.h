@@ -2970,7 +2970,7 @@ class format_string_checker {
     return context_.check_arg_id(index), index;
 #else
     (void)id;
-    on_error("compile-time checks for named arguments require C++20 support");
+    on_error("compile-ticks checks for named arguments require C++20 support");
     return 0;
 #endif
   }

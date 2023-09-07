@@ -11,6 +11,7 @@
 #include "map.h"
 #include "player_role.h"
 #include "player_info.h"
+#include "timer.h"
 
 #include <iostream>
 #include <array>
@@ -23,6 +24,7 @@ Game::Game(uint8_t max_players, uint8_t id, bool auto_restart)
 	this->id = id;
 	this->auto_restart = auto_restart;
 	this->in_progress = false;
+	game_begin_timer = std::make_unique<Timer>();
 }
 
 Game::~Game()
@@ -46,6 +48,9 @@ void Game::BroadcastPositions()
 
 void Game::Update()
 {
+	if (game_begin_timer->Tick())
+		Start();
+
 	if (!IsInProgress())
 		return;
 
@@ -59,7 +64,7 @@ void Game::Update()
 	UpdateGameState();
 	BroadcastPositions();
 
-	time++;
+	ticks++;
 }
 
 void Game::GenerateRoles()
@@ -73,6 +78,7 @@ void Game::GenerateRoles()
 	for (auto& player : players)
 	{
 		auto num = rng.uniform(0, (int)role_list.size()-1);
+
 		if (num < 0 || num >(int)PlayerRole::NUM_ROLES)
 		{
 			spdlog::error("fix GenerateRoles");
@@ -101,31 +107,44 @@ void Game::ValidateNames()
 	}
 }
 
-void Game::StartIfFull()
+void Game::Start()
 {
+	in_progress = true;
+	LoadMap("map_default.json");
+	spdlog::info("started game with id {}", GetId());
+	GenerateRoles();
+	ValidateNames();
+	std::vector<std::string> player_names;
+	std::vector<PlayerRole> player_roles;
+	for (auto& player : players)
+	{
+		player->player_info->SetActions(0);
+		player->state = ClientState::CSTATE_GAME;
+		player_names.push_back(player->player_info->GetName());
+		player_roles.push_back(player->player_info->GetRole());
+	}
+	for (auto& player : players)
+	{
+		OutBeginGame out_begin_game((uint8_t)players.size(), player->GetPid(),&player_names,&player_roles);
+		player->opcode_manager->Send(out_begin_game);
+	}
+
+	OutServerMessage start_game_msg(ServerMessageType::SMESSAGE_INFO, "Game started.");
+	Broadcast(start_game_msg);
+
+	broadcast_positions = true;
+}
+
+void Game::OnPlayerJoin(std::string player_name)
+{
+	//send "player blabla has joined lobby(id)"
+	OutServerMessage joined_msg(ServerMessageType::SMESSAGE_INFO, std::format("Player {} has joined Lobby({}).", player_name, std::to_string(id)));
+	Broadcast(joined_msg);
 	if (players.size() == max_players)
 	{
-		in_progress = true;
-		LoadMap("map_default.json");
-		spdlog::info("started game with id {}", GetId());
-		GenerateRoles();
-		ValidateNames();
-		std::vector<std::string> player_names;
-		std::vector<PlayerRole> player_roles;
-		for (auto& player : players)
-		{
-			player->player_info->SetActions(0);
-			player->state = ClientState::CSTATE_GAME;
-			player_names.push_back(player->player_info->GetName());
-			player_roles.push_back(player->player_info->GetRole());
-		}
-		for (auto& player : players)
-		{
-			OutBeginGame out_begin_game((uint8_t)players.size(), player->GetPid(),&player_names,&player_roles);
-			player->opcode_manager->Send(out_begin_game);
-		}
-		
-		broadcast_positions = true;
+		OutServerMessage start_msg(ServerMessageType::SMESSAGE_INFO, "Game starting in 3 seconds...");
+		Broadcast(start_msg);
+		game_begin_timer->Start(3000.0,false);
 	}
 }
 

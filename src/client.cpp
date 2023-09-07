@@ -4,6 +4,7 @@
 #include "opcode_manager.h"
 #include "utility.h"
 #include "client_input.h"
+#include "timer.h"
 
 #include "out_server_message.h"
 #include "player_info.h"
@@ -16,6 +17,7 @@ Client::Client(SOCKET socket)
 	opcode_manager = std::make_unique<OpcodeManager>(msg_manager);
 	client_input = std::make_shared<ClientInput>();
 	player_info = std::make_unique<PlayerInfo>();
+	timeout_timer = std::make_unique<Timer>();
 }
 
 Client::~Client()
@@ -39,25 +41,13 @@ void Client::AddToLobby(int id)
 {
 	state = ClientState::CSTATE_LOBBY;
 	msg_manager->WriteByte(0);
-	std::string lobby_msg = std::string("You are in lobby(") + std::to_string(id) + std::string(")");
-	OutServerMessage welcome(ServerMessageType::SMESSAGE_INFO, lobby_msg);
-	opcode_manager->Send(welcome);
-	timeout_counter = 0;
+	timeout_timer->Start(TIMEOUT_TIME,false);
 }
 
 int Client::UpdateAwaiting()
 {
 	if (state != ClientState::CSTATE_AWAITING)
 		return -1;
-	/*
-	if (timeout_counter >= 10)
-	{
-		Drop("logout timeout");
-		return;
-	}
-	*/
-
-	timeout_counter++;
 	
 	if (awaiting_substate == 0)
 	{
@@ -102,8 +92,7 @@ void Client::CheckTimeout()
 {
 	if (client_input->num_actions == 0)
 	{
-		timeout_counter++;
-		if (timeout_counter > 100)
+		if (timeout_timer->Tick())
 		{
 			Drop("timeout");
 			return;
@@ -111,48 +100,23 @@ void Client::CheckTimeout()
 	}
 	else
 	{
-		timeout_counter = 0;
+		timeout_timer->Restart();
 	}
 }
 
 void Client::Update()
 {
-	if (state == ClientState::CSTATE_GAME)
+	client_input->Reset();
+
+	auto success = opcode_manager->Receive(client_input, pid);
+	if (!success)
 	{
-		client_input->Reset();
-
-		auto success = opcode_manager->Receive(client_input, pid);
-		if (!success)
-		{
-			return Drop("opcode error");
-		}
-
-		CheckTimeout();
-
-		if (time == 0)
-		{
-			OutServerMessage welcome(ServerMessageType::SMESSAGE_INFO, "Game started!");
-			opcode_manager->Send(welcome);
-
-			//OpShowInterface design(3559);
-			//opcode_manager->Send(design);
-		}
-
-		time++;
+		return Drop("opcode error");
 	}
-	else if (state == ClientState::CSTATE_LOBBY)
-	{
-		client_input->Reset();
-		while (msg_manager->PendingInput())
-		{
-			client_input->num_actions = 1;
-			if (msg_manager->ReadByte() == 255)
-				Drop("requested");
-			else
-				msg_manager->ReadDiscard(1);
-		}
-		CheckTimeout();
-	}
+
+	CheckTimeout();
+
+	ticks++;
 }
 
 void Client::RejectConnection(uint8_t code)

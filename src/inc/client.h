@@ -13,6 +13,7 @@ class MsgManager;
 class OpcodeManager;
 class PlayerInfo;
 struct ClientInput;
+class Timer;
 
 class Client
 {
@@ -46,8 +47,8 @@ public:
 private:
 	static const size_t MAX_PACKET_SIZE = 1024;
 	static const uint8_t MAX_NAME_LEN = 29;
-	uint64_t time = 0;
-	int timeout_counter = 0;
+	const double TIMEOUT_TIME = 10000.0;
+	uint64_t ticks = 0;
 	uint8_t pid;
 	randutils::mt19937_rng rng;
 	uint32_t current_region = 0;
@@ -55,8 +56,11 @@ private:
 	std::queue<char> input;
 	std::queue<char> output;
 
+	std::unique_ptr<Timer> timeout_timer;
+
 	void Drop(std::string reason);
 	void RejectConnection(uint8_t code);
+
 	
 	void CheckTimeout();
 };

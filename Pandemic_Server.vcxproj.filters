@@ -40,6 +40,12 @@
     <Filter Include="Header Files\Game">
       <UniqueIdentifier>{481a9630-f2dc-41e4-874c-aa11255fe9a9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{4b00b707-fa00-43bf-969c-8a52c248b09b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{2cb01a26-3c91-4cd5-a48b-8a937849b679}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\server.cpp">
@@ -52,9 +58,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\opcode_manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client_input.cpp">
@@ -102,6 +105,12 @@
     <ClCompile Include="src\player_info.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
+    <ClCompile Include="src\utility.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\timer.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\inc\server.h">
@@ -114,9 +123,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\inc\opcode_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\inc\utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\inc\client_input.h">
@@ -172,6 +178,12 @@
     </ClInclude>
     <ClInclude Include="src\inc\player_role.h">
       <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\utility.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\timer.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

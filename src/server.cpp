@@ -13,9 +13,15 @@
 #include <array>
 #include <algorithm>
 #include <memory>
+#include <ctime>
+#include <ratio>
+#include <chrono>
+#include <thread>
 
 #include "client.h"
 #include "game.h"
+#include "utility.h"
+#include "player_info.h"
 
 #include "spdlog/spdlog.h"
 #include "nlohmann/json.hpp"
@@ -112,12 +118,22 @@ bool Server::Init()
 
 void Server::Run()
 {
+	using namespace std::chrono;
     running = true;
 
     while (running)
     {
+		high_resolution_clock::time_point t1 = high_resolution_clock::now();
         Tick();
-        Sleep(100);
+		high_resolution_clock::time_point t2 = high_resolution_clock::now();
+		duration<double, std::milli> time_span = t2 - t1;
+		util::SleepFor((100.0 - time_span.count())/1000.0);
+
+		/*
+		high_resolution_clock::time_point t3 = high_resolution_clock::now();
+		duration<double, std::milli> time_span2 = t3 - t1;
+		spdlog::info("tick took: {} ms", time_span2.count());
+		*/
     }
 }
 
@@ -222,13 +238,14 @@ void Server::UpdateAwaitingClients()
 			{
 				if (game->GetId() == requested_lobby)
 				{
-					if (!game->IsInProgress())
+					if (game->players.size() != game->GetMaxPlayers())
 					{
 						(*it)->SetPid(game->GeneratePid());
 						(*it)->AddToLobby(game->GetId());
+						auto name = (*it)->player_info->GetName();
 						game->players.push_back(std::move(*it));
 						it = awaiting_clients.erase(it);
-						game->StartIfFull();
+						game->OnPlayerJoin(name);
 						flag1 = true;
 					}
 					else

@@ -9,6 +9,7 @@
 class Client;
 class OpcodeOut;
 class Map;
+class Timer;
 
 #define MAX_PLAYERS 4
 
@@ -20,7 +21,7 @@ public:
 	bool IsInProgress();
 	void BroadcastPositions();
 	void Update();
-	void StartIfFull();
+	void OnPlayerJoin(std::string player_name);
 	void Kill(std::string reason);
 	bool LoadMap(std::string map_name);
 	bool RequestedKill();
@@ -37,17 +38,17 @@ private:
 	void Broadcast(OpcodeOut& opcode);
 	void GenerateRoles();
 	void ValidateNames();
+	void Start();
 	
 	bool in_progress = false;
 	bool broadcast_positions = false;
 	bool request_kill = false;
 	
-	uint64_t time = 0;
-	std::array<uint8_t, MAX_PLAYERS> positions;
+	uint64_t ticks = 0;
 	uint8_t id;
-	randutils::mt19937_rng rng;
-
 	uint8_t max_players;
-
+	std::array<uint8_t, MAX_PLAYERS> positions;
 	std::unique_ptr<Map> current_map;
+	std::unique_ptr<Timer> game_begin_timer;
+	randutils::mt19937_rng rng;
 };

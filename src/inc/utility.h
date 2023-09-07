@@ -9,4 +9,6 @@ namespace util
 	uint64_t NameToLong(std::string name);
 
 	bool IsValidCharForName(char c);
+
+	void SleepFor(double seconds);
 }
