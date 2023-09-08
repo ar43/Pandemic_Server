@@ -36,6 +36,7 @@ public:
 	uint8_t BitstreamGetNextByte();
 
 	bool GetError();
+	void SetError();
 private:
 	//std::unique_ptr<Encryption> packetEncryption;
 	//std::unique_ptr<Encryption> packetDecryption;

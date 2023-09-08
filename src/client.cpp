@@ -9,6 +9,8 @@
 #include "out_server_message.h"
 #include "player_info.h"
 
+
+
 Client::Client(SOCKET socket)
 {
 	this->socket = socket;
@@ -24,6 +26,24 @@ Client::~Client()
 {
 	spdlog::debug("client destructor called");
 }
+
+#pragma warning( push )
+#pragma warning( disable : 4244)
+void Client::PrintSocketError()
+{
+	wchar_t *s = NULL;
+	FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 
+		NULL, WSAGetLastError(),
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPWSTR)&s, 0, NULL);
+	//fprintf(stderr, "%S\n", s);
+	std::wstring ws(s);
+	// your new String
+	std::string str(ws.begin(), ws.end());
+	spdlog::warn(str);
+	LocalFree(s);
+}
+#pragma warning( pop ) 
 
 void Client::Drop(std::string reason)
 {
@@ -133,68 +153,69 @@ void Client::ReadInput()
 	if (dropped || disconnected)
 		return;
 	char recvbuf[Client::MAX_PACKET_SIZE] = { 0 };
-	int iResult = recv(socket, recvbuf, sizeof(recvbuf), 0);
-	if (iResult > (int)Client::MAX_PACKET_SIZE)
+	if (!input.empty())
+		spdlog::warn("Receiving new buffer before all data is processed? Could be an error.");
+	while (true)
 	{
-		spdlog::error("ReadInput: number of bytes received is too large ({})", iResult);
-		//closesocket(it->socket);
-	}
-	else if (iResult > 0)
-	{
-		if (!input.empty())
-			spdlog::warn("Received new buffer before previous was empty? Unexpected?");
-		//spdlog::debug("ReadInput: number of bytes received: {}", iResult);
-		//printf("Byte string:");
-		for (int i = 0; i < iResult; i++)
+		int result = recv(socket, recvbuf, sizeof(recvbuf), 0);
+		if (result > 0)
 		{
-			//printf(" %d", recvbuf[i]);
-			input.push(recvbuf[i]);
+			for (int i = 0; i < result; i++)
+			{
+				input.push(recvbuf[i]);
+			}
 		}
-		//printf("\n");
-
-
-	}
-	else if (iResult < 0)
-	{
-		if (WSAGetLastError() == WSAEWOULDBLOCK)
+		else if (result < 0)
 		{
-			return;
+			if (WSAGetLastError() == WSAEWOULDBLOCK)
+			{
+				return;
+			}
+			spdlog::warn("ReadInput: recv failed with error: {}", WSAGetLastError());
+			Client::PrintSocketError();
+			//closesocket(socket);
 		}
-		spdlog::warn("ReadInput: recv failed with error: {}", WSAGetLastError());
-		//closesocket(socket);
-	}
-	else if (iResult == 0)
-	{
-		spdlog::info("ReadInput: client disconnected...");
-		disconnected = true;
-		//closesocket(socket);
+		else if (result == 0)
+		{
+			spdlog::info("ReadInput: client disconnected...");
+			disconnected = true;
+			//closesocket(socket);
+		}
 	}
 }
 
 void Client::SendOutput()
 {
-	if (dropped || disconnected || output.empty())
+	if (disconnected || output.empty())
 		return;
 	char buffer[Client::MAX_PACKET_SIZE];
-	int size = (int)output.size();
 	int i = 0;
-	if (output.size() > Client::MAX_PACKET_SIZE)
-	{
-		spdlog::error("SendOutput: too large");
-	}
 	while (!output.empty())
 	{
+		if (i == sizeof(buffer))
+		{
+			int send_result = send( socket, buffer, i, 0 );
+			if (send_result == SOCKET_ERROR) 
+			{
+				spdlog::warn("SendOutput: send failed with error: {}", WSAGetLastError());
+				Client::PrintSocketError();
+				return;
+			}
+			memset(buffer, 0, sizeof(buffer));
+			i = 0;
+		}
 		buffer[i] = output.front();
 		output.pop();
 		i++;
 	}
-	int iSendResult = send( socket, buffer, size, 0 );
-	if (iSendResult == SOCKET_ERROR) 
+	int send_result = send( socket, buffer, i, 0 );
+	if (send_result == SOCKET_ERROR) 
 	{
 		spdlog::warn("SendOutput: send failed with error: {}", WSAGetLastError());
-		//closesocket(socket);
+		Client::PrintSocketError();
+		return;
 	}
-	spdlog::debug("SendOutput: bytes sent: {}", iSendResult);
+	spdlog::debug("SendOutput: bytes sent: {}", send_result);
 }
 
 uint8_t Client::GetPid()

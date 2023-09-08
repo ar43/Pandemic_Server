@@ -15,6 +15,11 @@ void InClientMessage::Receive(std::shared_ptr<MsgManager> const& msg_manager, st
 {
 	auto type = msg_manager->ReadByte();
 	auto length = msg_manager->ReadShort();
+	if (length > MAX_LENGTH)
+	{
+		msg_manager->SetError();
+		return;
+	}
 	auto msg = msg_manager->ReadString(length);
 
 	client_input->client_message = std::make_unique<std::pair<ClientMessageType, std::string>>((ClientMessageType)type, msg);

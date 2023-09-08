@@ -37,7 +37,7 @@ bool OpcodeManager::Receive(std::shared_ptr<ClientInput> const& client_input, ui
 		}
 		if (msg_manager->GetError())
 		{
-			spdlog::warn("client opcode {} - malformed packet - caused ReadByte underflow", opcode_id);
+			spdlog::warn("client opcode {} - malformed packet", opcode_id);
 			return false;
 		}
 			

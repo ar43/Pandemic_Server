@@ -196,3 +196,8 @@ bool MsgManager::GetError()
 {
 	return error;
 }
+
+void MsgManager::SetError()
+{
+	error = true;
+}

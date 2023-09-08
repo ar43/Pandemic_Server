@@ -26,12 +26,8 @@ uint8_t PlayerInfo::GetActions()
 
 void PlayerInfo::SetName(std::string new_name)
 {
-	
 	name = new_name;
-	std::remove_if(std::begin(name), std::end(name),[](const char & element)
-	{
-		return util::IsValidCharForName(element);
-	});
+	name.erase(std::remove_if(name.begin(), name.end(), util::IsValidCharForName), name.end());
 }
 
 std::string PlayerInfo::GetName()

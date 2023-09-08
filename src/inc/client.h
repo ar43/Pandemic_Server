@@ -56,6 +56,8 @@ private:
 	std::queue<char> input;
 	std::queue<char> output;
 
+	static void PrintSocketError();
+
 	std::unique_ptr<Timer> timeout_timer;
 
 	void Drop(std::string reason);
