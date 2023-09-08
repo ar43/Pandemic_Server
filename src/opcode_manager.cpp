@@ -42,6 +42,10 @@ bool OpcodeManager::Receive(std::shared_ptr<ClientInput> const& client_input, ui
 		}
 			
 		client_input->num_actions++;
+		if (client_input->num_actions >= 10)
+		{
+			spdlog::warn("client opcode {} - detected opcode flood", opcode_id);
+		}
 	}
 	return true;
 }

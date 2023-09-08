@@ -45,8 +45,8 @@ namespace util
     {
 		const std::string whitelist = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_()";
 		if (whitelist.find(c) != std::string::npos)
-			return true;
-		else
 			return false;
+		else
+			return true;
     }
 }

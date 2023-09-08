@@ -51,6 +51,8 @@ void Game::Update()
 	if (game_begin_timer->Tick())
 		Start();
 
+	ProcessClientMessages();
+
 	if (!IsInProgress())
 		return;
 
@@ -180,6 +182,25 @@ void Game::UpdateGameState()
 	}
 }
 
+void Game::ProcessClientMessages()
+{
+	for (auto& player : players)
+	{
+		auto &client_input = player->client_input;
+		if (client_input->client_message != nullptr)
+		{
+			if (client_input->client_message->first == ClientMessageType::CMESSAGE_CHAT)
+			{
+				std::string msg = player->player_info->GetName() + std::string(": ") + client_input->client_message->second;
+				OutServerMessage chat_msg(ServerMessageType::SMESSAGE_CHAT, msg);
+				Broadcast(chat_msg);
+				client_input->client_message = nullptr;
+			}
+
+		}
+	}
+}
+
 void Game::ProcessInput()
 {
 	for (auto& player : players)
@@ -195,17 +216,6 @@ void Game::ProcessInput()
 				player->player_info->SetActions(player->player_info->GetActions() - 1);
 			}
 			client_input->requested_move = false;
-		}
-		if (client_input->client_message != nullptr)
-		{
-			if (client_input->client_message->first == ClientMessageType::CMESSAGE_CHAT)
-			{
-				std::string msg = player->player_info->GetName() + std::string(": ") + client_input->client_message->second;
-				OutServerMessage chat_msg(ServerMessageType::SMESSAGE_CHAT, msg);
-				Broadcast(chat_msg);
-				client_input->client_message = nullptr;
-			}
-			
 		}
 	}
 }

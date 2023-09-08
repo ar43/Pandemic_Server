@@ -32,13 +32,13 @@ public:
 	bool auto_restart;
 
 private:
-	
 	void UpdateGameState();
 	void ProcessInput();
 	void Broadcast(OpcodeOut& opcode);
 	void GenerateRoles();
 	void ValidateNames();
 	void Start();
+	void ProcessClientMessages();
 	
 	bool in_progress = false;
 	bool broadcast_positions = false;

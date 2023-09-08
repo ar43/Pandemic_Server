@@ -45,7 +45,7 @@ public:
 	bool disconnected = false;
 
 private:
-	static const size_t MAX_PACKET_SIZE = 1024;
+	static const size_t PACKET_SIZE = 1024;
 	static const uint8_t MAX_NAME_LEN = 29;
 	const double TIMEOUT_TIME = 10000.0;
 	uint64_t ticks = 0;

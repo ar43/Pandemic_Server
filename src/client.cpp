@@ -91,7 +91,16 @@ int Client::UpdateAwaiting()
 			}
 			std::string name = msg_manager->ReadString(name_length);
 			player_info->SetName(name);
-			
+			if (player_info->GetName().length() < 3)
+			{
+				Drop("invalid name");
+				return -1;
+			}
+			if (msg_manager->GetError())
+			{
+				Drop("error during handshake");
+				return -1;
+			}
 			return lobby_id;
 		}
 	}
@@ -152,9 +161,11 @@ void Client::ReadInput()
 {
 	if (dropped || disconnected)
 		return;
-	char recvbuf[Client::MAX_PACKET_SIZE] = { 0 };
+	const int MAX_INPUT_PER_TICK = 5120;
+	char recvbuf[Client::PACKET_SIZE] = { 0 };
 	if (!input.empty())
 		spdlog::warn("Receiving new buffer before all data is processed? Could be an error.");
+	int total_bytes_received = 0;
 	while (true)
 	{
 		int result = recv(socket, recvbuf, sizeof(recvbuf), 0);
@@ -163,22 +174,32 @@ void Client::ReadInput()
 			for (int i = 0; i < result; i++)
 			{
 				input.push(recvbuf[i]);
+				total_bytes_received++;
+				if (total_bytes_received > MAX_INPUT_PER_TICK)
+				{
+					//100% trying to flood the server, get rid of him
+					spdlog::warn("Detected packet flood");
+					Drop("packet flood");
+					return;
+				}
 			}
 		}
 		else if (result < 0)
 		{
 			if (WSAGetLastError() == WSAEWOULDBLOCK)
 			{
-				return;
+				break;
 			}
 			spdlog::warn("ReadInput: recv failed with error: {}", WSAGetLastError());
 			Client::PrintSocketError();
+			break;
 			//closesocket(socket);
 		}
 		else if (result == 0)
 		{
 			spdlog::info("ReadInput: client disconnected...");
 			disconnected = true;
+			break;
 			//closesocket(socket);
 		}
 	}
@@ -188,7 +209,7 @@ void Client::SendOutput()
 {
 	if (disconnected || output.empty())
 		return;
-	char buffer[Client::MAX_PACKET_SIZE];
+	char buffer[Client::PACKET_SIZE];
 	int i = 0;
 	while (!output.empty())
 	{
