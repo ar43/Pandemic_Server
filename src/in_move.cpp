@@ -2,7 +2,7 @@
 #include "client_input.h"
 #include "msg_manager.h"
 
-InMove::InMove() : OpcodeIn(1)
+InMove::InMove() : OpcodeIn(ClientOpcode::MOVE)
 {
 }
 

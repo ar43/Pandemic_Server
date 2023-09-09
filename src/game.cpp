@@ -25,6 +25,8 @@ Game::Game(uint8_t max_players, uint8_t id, bool auto_restart)
 	this->auto_restart = auto_restart;
 	this->in_progress = false;
 	game_begin_timer = std::make_unique<Timer>();
+	lobby_player_count_timer = std::make_unique <Timer>();
+	lobby_player_count_timer->Start(1000.0, true);
 }
 
 Game::~Game()
@@ -46,27 +48,37 @@ void Game::BroadcastPositions()
 	}
 }
 
+void Game::SendLobbyPlayerCount()
+{
+	OutServerMessage msg(ServerMessageType::SMESSAGE_LOBBY, std::format("Players in lobby: {}/{}", players.size(),GetMaxPlayers()));
+	Broadcast(msg);
+}
+
 void Game::Update()
 {
-	if (game_begin_timer->Tick())
-		Start();
-
 	ProcessClientMessages();
 
 	if (!IsInProgress())
-		return;
-
-	if (players.size() != max_players)
 	{
-		Kill("player disconnected");
-		return;
+		if (game_begin_timer->Tick())
+			Start();
+		if (lobby_player_count_timer->Tick())
+			SendLobbyPlayerCount();
 	}
+	else
+	{
+		if (players.size() != max_players)
+		{
+			Kill("player disconnected");
+			return;
+		}
 
-	ProcessInput();
-	UpdateGameState();
-	BroadcastPositions();
+		ProcessInput();
+		UpdateGameState();
+		BroadcastPositions();
 
-	ticks++;
+		ticks++;
+	}
 }
 
 void Game::GenerateRoles()
@@ -111,6 +123,12 @@ void Game::ValidateNames()
 
 void Game::Start()
 {
+	if (players.size() != GetMaxPlayers())
+	{
+		OutServerMessage cancel_msg(ServerMessageType::SMESSAGE_INFO, "Game start canceled because a player left.");
+		Broadcast(cancel_msg);
+		return;
+	}
 	in_progress = true;
 	LoadMap("map_default.json");
 	spdlog::info("started game with id {}", GetId());

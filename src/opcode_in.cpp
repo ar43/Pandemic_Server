@@ -1,6 +1,6 @@
 #include "opcode_in.h"
 
-OpcodeIn::OpcodeIn(uint8_t id)
+OpcodeIn::OpcodeIn(ClientOpcode id)
 {
 	this->id = id;
 }

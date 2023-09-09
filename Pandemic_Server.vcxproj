@@ -168,6 +168,7 @@
     <ClInclude Include="src\inc\client.h" />
     <ClInclude Include="src\inc\client_input.h" />
     <ClInclude Include="src\inc\client_message_type.h" />
+    <ClInclude Include="src\inc\client_opcode.h" />
     <ClInclude Include="src\inc\client_state.h" />
     <ClInclude Include="src\inc\game.h" />
     <ClInclude Include="src\inc\in_client_message.h" />
@@ -186,6 +187,7 @@
     <ClInclude Include="src\inc\player_role.h" />
     <ClInclude Include="src\inc\server.h" />
     <ClInclude Include="src\inc\server_message_type.h" />
+    <ClInclude Include="src\inc\server_opcode.h" />
     <ClInclude Include="src\inc\timer.h" />
     <ClInclude Include="src\inc\utility.h" />
   </ItemGroup>

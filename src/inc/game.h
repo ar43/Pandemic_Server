@@ -39,6 +39,7 @@ private:
 	void ValidateNames();
 	void Start();
 	void ProcessClientMessages();
+	void SendLobbyPlayerCount();
 	
 	bool in_progress = false;
 	bool broadcast_positions = false;
@@ -50,5 +51,6 @@ private:
 	std::array<uint8_t, MAX_PLAYERS> positions;
 	std::unique_ptr<Map> current_map;
 	std::unique_ptr<Timer> game_begin_timer;
+	std::unique_ptr<Timer> lobby_player_count_timer;
 	randutils::mt19937_rng rng;
 };

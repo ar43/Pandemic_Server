@@ -1,5 +1,6 @@
 #pragma once
 
-enum class ClientMessageType {
+enum class ClientMessageType 
+{
 	CMESSAGE_CHAT,
 };

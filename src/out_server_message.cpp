@@ -1,7 +1,7 @@
 #include "out_server_message.h"
 #include "msg_manager.h"
 
-OutServerMessage::OutServerMessage(ServerMessageType server_message_type, std::string msg) : OpcodeOut(0)
+OutServerMessage::OutServerMessage(ServerMessageType server_message_type, std::string msg) : OpcodeOut(ServerOpcode::SERVER_MESSAGE)
 {
 	this->msg = msg;
 	this->server_message_type = server_message_type;

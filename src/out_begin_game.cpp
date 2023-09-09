@@ -2,7 +2,7 @@
 #include "msg_manager.h"
 #include "client.h"
 
-OutBeginGame::OutBeginGame(uint8_t num_players, uint8_t player_id, std::vector<std::string> *player_names, std::vector<PlayerRole> *player_roles) : OpcodeOut(2)
+OutBeginGame::OutBeginGame(uint8_t num_players, uint8_t player_id, std::vector<std::string> *player_names, std::vector<PlayerRole> *player_roles) : OpcodeOut(ServerOpcode::BEGIN_GAME)
 {
 	this->num_players = num_players;
 	this->player_id = player_id;

@@ -3,7 +3,7 @@
 #include "client_input.h"
 #include "msg_manager.h"
 
-InClientMessage::InClientMessage() : OpcodeIn(2)
+InClientMessage::InClientMessage() : OpcodeIn(ClientOpcode::CLIENT_MESSAGE)
 {
 }
 

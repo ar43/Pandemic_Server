@@ -2,7 +2,7 @@
 #include "msg_manager.h"
 #include "spdlog/spdlog.h"
 
-OutUpdatePlayers::OutUpdatePlayers(uint8_t num_players, uint8_t *locations) : OpcodeOut(1)
+OutUpdatePlayers::OutUpdatePlayers(uint8_t num_players, uint8_t *locations) : OpcodeOut(ServerOpcode::UPDATE_PLAYERS)
 {
 	this->num_players = num_players;
 	if (locations == NULL)

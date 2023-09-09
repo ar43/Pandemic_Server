@@ -1,6 +1,6 @@
 #include "in_idle.h"
 
-InIdle::InIdle() : OpcodeIn(0)
+InIdle::InIdle() : OpcodeIn(ClientOpcode::IDLE)
 {
 }
 

@@ -52,11 +52,12 @@ bool OpcodeManager::Receive(std::shared_ptr<ClientInput> const& client_input, ui
 
 std::unique_ptr<OpcodeIn> OpcodeManager::GetOpcode(uint8_t id)
 {
-	switch (id)
+	ClientOpcode opcode = (ClientOpcode)id;
+	switch (opcode)
 	{
-		case 0: return std::make_unique<InIdle>();
-		case 1: return std::make_unique<InMove>();
-		case 2: return std::make_unique<InClientMessage>();
+		case ClientOpcode::IDLE: return std::make_unique<InIdle>();
+		case ClientOpcode::MOVE: return std::make_unique<InMove>();
+		case ClientOpcode::CLIENT_MESSAGE: return std::make_unique<InClientMessage>();
 		default: return std::make_unique<InError>();
 
 	}

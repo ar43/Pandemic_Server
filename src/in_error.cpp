@@ -2,7 +2,7 @@
 #include "spdlog/spdlog.h"
 #include "client_input.h"
 
-InError::InError() : OpcodeIn(255)
+InError::InError() : OpcodeIn((ClientOpcode)0)
 {
 }
 

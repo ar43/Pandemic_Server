@@ -190,6 +190,12 @@ void Client::ReadInput()
 			{
 				break;
 			}
+			if (WSAGetLastError() == WSAECONNRESET)
+			{
+				spdlog::info("ReadInput: client disconnected...");
+				disconnected = true;
+				break;
+			}
 			spdlog::warn("ReadInput: recv failed with error: {}", WSAGetLastError());
 			Client::PrintSocketError();
 			break;

@@ -1,17 +1,18 @@
 #pragma once
 #include <stdint.h>
 #include <memory>
+#include "server_opcode.h"
 
 class MsgManager;
 
 class OpcodeOut
 {
 public:
-	OpcodeOut(uint8_t id);
+	OpcodeOut(ServerOpcode id);
 	~OpcodeOut();
 
 	virtual void Send(std::shared_ptr<MsgManager> const& msg_manager) = 0;
 	uint8_t GetId();
 private:
-	uint8_t id;
+	ServerOpcode id;
 };
