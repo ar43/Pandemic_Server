@@ -1,5 +1,7 @@
 #include "player_info.h"
 #include "utility.h"
+#include "card_stack.h"
+#include <memory>
 #include <string>
 
 PlayerInfo::PlayerInfo()
@@ -8,6 +10,7 @@ PlayerInfo::PlayerInfo()
 	role = (PlayerRole)0;
 	actions = 0;
 	position = 0;
+	hand = std::make_unique<CardStack>(0);
 }
 
 PlayerInfo::~PlayerInfo()

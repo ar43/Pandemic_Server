@@ -111,6 +111,12 @@
     <ClCompile Include="src\timer.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\card_stack.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\out_update_player_card.cpp">
+      <Filter>Source Files\Opcodes\Out</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\inc\server.h">
@@ -190,6 +196,15 @@
     </ClInclude>
     <ClInclude Include="src\inc\client_opcode.h">
       <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\player_card.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\card_stack.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\out_update_player_card.h">
+      <Filter>Header Files\Opcodes\Out</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

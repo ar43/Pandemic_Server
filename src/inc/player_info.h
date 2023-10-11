@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
+#include <memory>
 #include <player_role.h>
+
+class CardStack;
 
 class PlayerInfo
 {
@@ -19,6 +22,8 @@ public:
 
 	void SetPosition(uint8_t new_position);
 	uint8_t GetPosition();
+
+	std::unique_ptr<CardStack> hand;
 
 private:
 	std::string name;

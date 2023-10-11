@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\card_stack.cpp" />
     <ClCompile Include="src\city.cpp" />
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\client_input.cpp" />
@@ -158,12 +159,14 @@
     <ClCompile Include="src\out_begin_game.cpp" />
     <ClCompile Include="src\out_server_message.cpp" />
     <ClCompile Include="src\out_update_players.cpp" />
+    <ClCompile Include="src\out_update_player_card.cpp" />
     <ClCompile Include="src\player_info.cpp" />
     <ClCompile Include="src\server.cpp" />
     <ClCompile Include="src\timer.cpp" />
     <ClCompile Include="src\utility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\inc\card_stack.h" />
     <ClInclude Include="src\inc\city.h" />
     <ClInclude Include="src\inc\client.h" />
     <ClInclude Include="src\inc\client_input.h" />
@@ -183,6 +186,8 @@
     <ClInclude Include="src\inc\out_begin_game.h" />
     <ClInclude Include="src\inc\out_server_message.h" />
     <ClInclude Include="src\inc\out_update_players.h" />
+    <ClInclude Include="src\inc\out_update_player_card.h" />
+    <ClInclude Include="src\inc\player_card.h" />
     <ClInclude Include="src\inc\player_info.h" />
     <ClInclude Include="src\inc\player_role.h" />
     <ClInclude Include="src\inc\server.h" />

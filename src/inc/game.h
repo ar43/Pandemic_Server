@@ -10,6 +10,7 @@ class Client;
 class OpcodeOut;
 class Map;
 class Timer;
+class CardStack;
 
 #define MAX_PLAYERS 4
 
@@ -50,6 +51,7 @@ private:
 	uint8_t max_players;
 	std::array<uint8_t, MAX_PLAYERS> positions;
 	std::unique_ptr<Map> current_map;
+	std::unique_ptr<CardStack> player_card_deck;
 	std::unique_ptr<Timer> game_begin_timer;
 	std::unique_ptr<Timer> lobby_player_count_timer;
 	randutils::mt19937_rng rng;

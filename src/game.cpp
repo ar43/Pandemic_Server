@@ -12,6 +12,9 @@
 #include "player_role.h"
 #include "player_info.h"
 #include "timer.h"
+#include "card_stack.h"
+#include "player_card.h"
+#include "out_update_player_card.h"
 
 #include <iostream>
 #include <array>
@@ -25,6 +28,7 @@ Game::Game(uint8_t max_players, uint8_t id, bool auto_restart)
 	this->auto_restart = auto_restart;
 	this->in_progress = false;
 	game_begin_timer = std::make_unique<Timer>();
+	player_card_deck = std::make_unique<CardStack>((uint8_t)(PlayerCard::NUM_PLAYER_CARDS));
 	lobby_player_count_timer = std::make_unique <Timer>();
 	lobby_player_count_timer->Start(1000.0, true);
 }
@@ -142,11 +146,17 @@ void Game::Start()
 		player->state = ClientState::CSTATE_GAME;
 		player_names.push_back(player->player_info->GetName());
 		player_roles.push_back(player->player_info->GetRole());
+
+		player->player_info->hand->AddCard(player_card_deck->Draw());
+		player->player_info->hand->AddCard(player_card_deck->Draw());
 	}
 	for (auto& player : players)
 	{
 		OutBeginGame out_begin_game((uint8_t)players.size(), player->GetPid(),&player_names,&player_roles);
 		player->opcode_manager->Send(out_begin_game);
+
+		OutUpdatePlayerCard out_update_player_card(player->GetPid(), false, (uint8_t)player->player_info->hand->GetSize(), player->player_info->hand->GetPointer());
+		Broadcast(out_update_player_card);
 	}
 
 	OutServerMessage start_game_msg(ServerMessageType::SMESSAGE_INFO, "Game started.");
