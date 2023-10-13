@@ -20,7 +20,7 @@ Map::Map(std::string map_name)
 		int id = (int)data["_id"];
 		std::string name = data["_name"];
 		std::vector<int> neighbours = data["_neighbourIds"];
-		CityColor city_color = (CityColor)data["__cityColor"];
+		CityColor city_color = (CityColor)data["_cityColor"];
 		this->cities[(int)data["_id"]] = std::make_unique<City>(id, name, neighbours);
 	}
 }
