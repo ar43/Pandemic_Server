@@ -168,6 +168,7 @@
   <ItemGroup>
     <ClInclude Include="src\inc\card_stack.h" />
     <ClInclude Include="src\inc\city.h" />
+    <ClInclude Include="src\inc\city_color.h" />
     <ClInclude Include="src\inc\client.h" />
     <ClInclude Include="src\inc\client_input.h" />
     <ClInclude Include="src\inc\client_message_type.h" />

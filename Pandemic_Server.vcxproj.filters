@@ -206,5 +206,8 @@
     <ClInclude Include="src\inc\out_update_player_card.h">
       <Filter>Header Files\Opcodes\Out</Filter>
     </ClInclude>
+    <ClInclude Include="src\inc\city_color.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

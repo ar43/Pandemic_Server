@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "city_color.h"
 
 class City
 {
@@ -11,5 +12,6 @@ public:
 private:
 	int id;
 	std::string name;
+	CityColor city_color;
 	
 };
