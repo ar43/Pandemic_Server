@@ -27,7 +27,6 @@ Map::Map(std::string map_name)
 
 Map::~Map()
 {
-
 }
 
 bool Map::IsCityNeighbour(int first_id, int second_id)
