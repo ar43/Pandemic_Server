@@ -15,6 +15,8 @@
 #include "card_stack.h"
 #include "player_card.h"
 #include "out_update_player_card.h"
+#include "infection_card.h"
+#include "out_trigger_infection.h"
 
 #include <iostream>
 #include <array>
@@ -29,6 +31,8 @@ Game::Game(uint8_t max_players, uint8_t id, bool auto_restart)
 	this->in_progress = false;
 	game_begin_timer = std::make_unique<Timer>();
 	player_card_deck = std::make_unique<CardStack>((uint8_t)(PlayerCard::NUM_PLAYER_CARDS));
+	infection_card_deck = std::make_unique<CardStack>((uint8_t)(InfectionCard::NUM_INFECTION_CARDS));
+	infection_card_discard_pile = std::make_unique<CardStack>(0);
 	lobby_player_count_timer = std::make_unique <Timer>();
 	lobby_player_count_timer->Start(1000.0, true);
 }
@@ -159,6 +163,16 @@ void Game::Start()
 		Broadcast(out_update_player_card);
 	}
 
+	DrawInfectionCard(3);
+	DrawInfectionCard(3);
+	DrawInfectionCard(3);
+	DrawInfectionCard(2);
+	DrawInfectionCard(2);
+	DrawInfectionCard(2);
+	DrawInfectionCard(1);
+	DrawInfectionCard(1);
+	DrawInfectionCard(1);
+
 	OutServerMessage start_game_msg(ServerMessageType::SMESSAGE_INFO, "Game started.");
 	Broadcast(start_game_msg);
 
@@ -225,6 +239,49 @@ void Game::ProcessClientMessages()
 				client_input->client_message = nullptr;
 			}
 
+		}
+	}
+}
+
+void Game::DrawInfectionCard(uint8_t infection_multiplier)
+{
+	if (infection_multiplier <= 0 || infection_multiplier > 3)
+	{
+		spdlog::error("Game::DrawInfectionCard: infection_multiplier invalid");
+		return;
+	}
+
+	std::vector<std::pair<uint8_t, uint8_t>> infection_data;
+	auto card = infection_card_deck->Draw();
+	auto city_id = current_map->InfectionCardToCityId(card);
+	InfectionType type = current_map->GetInfectionTypeFromCity(city_id);
+
+	current_map->ResetExplosions();
+
+	InfectCity(city_id, card, type, infection_multiplier, infection_data);
+
+	infection_card_discard_pile->AddCard(card);
+
+	OutTriggerInfection packet(card, infection_data);
+	Broadcast(packet);
+}
+
+void Game::InfectCity(int city_id, uint8_t card_id, InfectionType type, uint8_t infection_multiplier, std::vector<std::pair<uint8_t, uint8_t>> &infection_data)
+{
+	auto data = current_map->AddInfection(city_id, type, infection_multiplier);
+	bool explosion = data.second;
+	int new_infection_count = data.first;
+	for (int i = 0; i < new_infection_count; i++)
+	{
+		infection_data.push_back(std::make_pair((uint8_t)type, (uint8_t)city_id));
+	}
+	if (explosion)
+	{
+		infection_data.push_back(std::make_pair((uint8_t)type, (uint8_t)city_id));
+		auto neighbours = current_map->GetNeighbours(city_id);
+		for (auto cid : neighbours)
+		{
+			InfectCity(cid, card_id, type, infection_multiplier, infection_data);
 		}
 	}
 }

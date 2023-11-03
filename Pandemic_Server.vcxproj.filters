@@ -117,6 +117,9 @@
     <ClCompile Include="src\out_update_player_card.cpp">
       <Filter>Source Files\Opcodes\Out</Filter>
     </ClCompile>
+    <ClCompile Include="src\out_trigger_infection.cpp">
+      <Filter>Source Files\Opcodes\Out</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\inc\server.h">
@@ -207,6 +210,15 @@
       <Filter>Header Files\Opcodes\Out</Filter>
     </ClInclude>
     <ClInclude Include="src\inc\city_color.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\infection_card.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\out_trigger_infection.h">
+      <Filter>Header Files\Opcodes\Out</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\infection_type.h">
       <Filter>Header Files\Enums</Filter>
     </ClInclude>
   </ItemGroup>

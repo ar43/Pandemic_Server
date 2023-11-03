@@ -1,4 +1,5 @@
 #include "city.h"
+#include "spdlog/spdlog.h"
 
 City::City(int id, std::string name, std::vector<int>& neighbour_ids)
 {
@@ -8,8 +9,54 @@ City::City(int id, std::string name, std::vector<int>& neighbour_ids)
 	{
 		this->neighbour_ids.push_back(neigbour_id);
 	}
+
+	this->can_explode = true;
+	for (int i = 0; i < NUM_INFECTIONS; i++)
+		this->infections[i] = 0;
 }
 
 City::~City()
 {
+}
+
+std::pair<int, bool> City::AddInfection(InfectionType type, uint8_t count)
+{
+	size_t index = (size_t)type;
+	if (index >= NUM_INFECTIONS || index < 0)
+	{
+		spdlog::error("City::AddInfection: type out of bounds");
+		return std::make_pair(0, false);
+	}
+
+	if (infections[index] == 3)
+	{
+		if (can_explode)
+		{
+			can_explode = false;
+			return std::make_pair(0, true);
+		}
+		else
+		{
+			return std::make_pair(0, false);
+		}
+	}
+
+	uint8_t old_infections = infections[index];
+	infections[index] += count;
+	if (infections[index] > 3)
+	{
+		infections[index] = 3;
+	}
+
+	return std::make_pair(infections[index]-old_infections, false);
+}
+
+void City::ResetExplosion()
+{
+	can_explode = true;
+}
+
+CityColor City::GetColor()
+{
+	return city_color;
 }
