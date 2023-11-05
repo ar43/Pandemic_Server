@@ -6,6 +6,8 @@
 #include <cerrno>
 #include <iostream>
 #include "city.h"
+#include "player_card.h"
+#include "infection_card.h"
 
 using json = nlohmann::json;
 
@@ -21,7 +23,13 @@ Map::Map(std::string map_name)
 		std::string name = data["_name"];
 		std::vector<int> neighbours = data["_neighbourIds"];
 		CityColor city_color = (CityColor)data["_cityColor"];
-		this->cities[(int)data["_id"]] = std::make_unique<City>(id, name, neighbours);
+		PlayerCard player_card = (PlayerCard)data["_playerCard"];
+		InfectionCard infection_card = (InfectionCard)data["_infectionCard"];
+		if (infection_card >= InfectionCard::NUM_INFECTION_CARDS)
+			spdlog::error("Map::Map: invalid InfectionCard");
+		if (player_card >= PlayerCard::NUM_PLAYER_CARDS)
+			spdlog::error("Map::Map: invalid InfectionCard");
+		this->cities[(int)data["_id"]] = std::make_unique<City>(id, name, neighbours, city_color, player_card, infection_card);
 	}
 }
 
@@ -29,9 +37,20 @@ Map::~Map()
 {
 }
 
-int Map::InfectionCardToCityId(int id)
+int Map::InfectionCardToCityId(InfectionCard infection_card)
 {
-	spdlog::error("Map::InfectionCardToCityId - unimplemented");
+	if (infection_card >= InfectionCard::NUM_INFECTION_CARDS)
+	{
+		spdlog::error("Map::InfectionCardToCityId - invalid InfectionCard {}", (int)infection_card);
+		return 0;
+	}
+		
+	for (auto& it : cities)
+	{
+		if (it.second->GetInfectionCard() == infection_card)
+			return it.second->GetId();
+	}
+	spdlog::error("Map::InfectionCardToCityId - can't find id {}", (int)infection_card);
 	return 0;
 }
 

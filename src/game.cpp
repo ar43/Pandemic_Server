@@ -253,7 +253,7 @@ void Game::DrawInfectionCard(uint8_t infection_multiplier)
 
 	std::vector<std::pair<uint8_t, uint8_t>> infection_data;
 	auto card = infection_card_deck->Draw();
-	auto city_id = current_map->InfectionCardToCityId(card);
+	auto city_id = current_map->InfectionCardToCityId((InfectionCard)card);
 	InfectionType type = current_map->GetInfectionTypeFromCity(city_id);
 
 	current_map->ResetExplosions();

@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include "infection_type.h"
+#include "infection_card.h"
 
 class City;
 
@@ -13,7 +14,7 @@ public:
 	Map(std::string map_name);
 	~Map();
 
-	int InfectionCardToCityId(int id);
+	int InfectionCardToCityId(InfectionCard infection_card);
 	void ResetExplosions();
 	bool IsCityNeighbour(int first_id, int second_id);
 	std::pair<int, bool> AddInfection(int id, InfectionType type, uint8_t count);

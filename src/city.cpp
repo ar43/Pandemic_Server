@@ -1,7 +1,7 @@
 #include "city.h"
 #include "spdlog/spdlog.h"
 
-City::City(int id, std::string name, std::vector<int>& neighbour_ids)
+City::City(int id, std::string name, std::vector<int>& neighbour_ids, CityColor city_color, PlayerCard player_card, InfectionCard infection_card)
 {
 	this->id = id;
 	this->name = name;
@@ -13,6 +13,10 @@ City::City(int id, std::string name, std::vector<int>& neighbour_ids)
 	this->can_explode = true;
 	for (int i = 0; i < NUM_INFECTIONS; i++)
 		this->infections[i] = 0;
+	
+	this->player_card = player_card;
+	this->infection_card = infection_card;
+	this->city_color = city_color;
 }
 
 City::~City()
@@ -59,4 +63,19 @@ void City::ResetExplosion()
 CityColor City::GetColor()
 {
 	return city_color;
+}
+
+PlayerCard City::GetPlayerCard()
+{
+	return player_card;
+}
+
+InfectionCard City::GetInfectionCard()
+{
+	return infection_card;
+}
+
+int City::GetId()
+{
+	return id;
 }
