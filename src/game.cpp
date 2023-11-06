@@ -172,6 +172,10 @@ void Game::Start()
 	DrawInfectionCard(1);
 	DrawInfectionCard(1);
 	DrawInfectionCard(1);
+	DebugInfect(InfectionCard::ICARD_LONDON);
+	DebugInfect(InfectionCard::ICARD_LONDON);
+	DebugInfect(InfectionCard::ICARD_LONDON);
+	DebugInfect(InfectionCard::ICARD_LONDON);
 
 	OutServerMessage start_game_msg(ServerMessageType::SMESSAGE_INFO, "Game started.");
 	Broadcast(start_game_msg);
@@ -241,6 +245,22 @@ void Game::ProcessClientMessages()
 
 		}
 	}
+}
+
+void Game::DebugInfect(InfectionCard target_card)
+{
+	std::vector<std::pair<uint8_t, uint8_t>> infection_data;
+	auto card = (uint8_t)target_card;
+	auto city_id = current_map->InfectionCardToCityId((InfectionCard)card);
+	spdlog::debug("debugging city_id: {}", city_id);
+	InfectionType type = current_map->GetInfectionTypeFromCity(city_id);
+
+	current_map->ResetExplosions();
+
+	InfectCity(city_id, card, type, 1, infection_data);
+
+	OutTriggerInfection packet(card, infection_data);
+	Broadcast(packet);
 }
 
 void Game::DrawInfectionCard(uint8_t infection_multiplier)

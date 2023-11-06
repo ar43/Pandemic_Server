@@ -8,6 +8,7 @@
 
 #include "randutils.hpp"
 #include "infection_type.h"
+#include "infection_card.h"
 
 class Client;
 class OpcodeOut;
@@ -46,6 +47,7 @@ private:
 	void SendLobbyPlayerCount();
 
 	void DrawInfectionCard(uint8_t infection_multiplier);
+	void DebugInfect(InfectionCard target_card);
 	void InfectCity(int city_id, uint8_t card_id, InfectionType type, uint8_t infection_multiplier, std::vector<std::pair<uint8_t, uint8_t>> &infection_data);
 	
 	bool in_progress = false;
