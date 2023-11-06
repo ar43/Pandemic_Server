@@ -297,7 +297,7 @@ void Game::InfectCity(int city_id, uint8_t card_id, InfectionType type, uint8_t 
 	}
 	if (explosion)
 	{
-		infection_data.push_back(std::make_pair((uint8_t)type, (uint8_t)city_id));
+		infection_data.push_back(std::make_pair((uint8_t)InfectionType::EXPLOSION, (uint8_t)city_id));
 		auto neighbours = current_map->GetNeighbours(city_id);
 		for (auto cid : neighbours)
 		{
