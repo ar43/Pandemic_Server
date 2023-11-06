@@ -24,7 +24,7 @@ void OutTriggerInfection::Send(std::shared_ptr<MsgManager> const& msg_manager)
 	for (size_t i = 0; i < length; i++)
 	{
 		uint8_t infection_type = infection_data.at(i).first;
-		uint8_t city_id = infection_data.at(i).first;
+		uint8_t city_id = infection_data.at(i).second;
 		msg_manager->WriteByte(infection_type);
 		msg_manager->WriteByte(city_id);
 	}
