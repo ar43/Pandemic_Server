@@ -30,6 +30,7 @@ Map::Map(std::string map_name)
 		if (player_card >= PlayerCard::NUM_PLAYER_CARDS)
 			spdlog::error("Map::Map: invalid InfectionCard");
 		this->cities[(int)data["_id"]] = std::make_unique<City>(id, name, neighbours, city_color, player_card, infection_card);
+
 	}
 }
 

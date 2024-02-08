@@ -172,10 +172,6 @@ void Game::Start()
 	DrawInfectionCard(1);
 	DrawInfectionCard(1);
 	DrawInfectionCard(1);
-	DebugInfect(InfectionCard::ICARD_LONDON);
-	DebugInfect(InfectionCard::ICARD_LONDON);
-	DebugInfect(InfectionCard::ICARD_LONDON);
-	DebugInfect(InfectionCard::ICARD_LONDON);
 
 	OutServerMessage start_game_msg(ServerMessageType::SMESSAGE_INFO, "Game started.");
 	Broadcast(start_game_msg);
