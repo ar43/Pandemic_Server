@@ -20,6 +20,7 @@ public:
 	std::pair<int, bool> AddInfection(int id, InfectionType type, uint8_t count);
 	std::vector<int> GetNeighbours(int id);
 	InfectionType GetInfectionTypeFromCity(int id);
+	int FindCityId(std::string name);
 private:
 	std::unordered_map<int, std::unique_ptr<City>> cities;
 };

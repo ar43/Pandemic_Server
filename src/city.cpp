@@ -75,6 +75,11 @@ InfectionCard City::GetInfectionCard()
 	return infection_card;
 }
 
+std::string City::GetName()
+{
+	return this->name;
+}
+
 int City::GetId()
 {
 	return id;

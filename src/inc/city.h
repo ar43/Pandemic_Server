@@ -21,6 +21,7 @@ public:
 	PlayerCard GetPlayerCard();
 	InfectionCard GetInfectionCard();
 	int GetId();
+	std::string GetName();
 private:
 	int id;
 	std::string name;

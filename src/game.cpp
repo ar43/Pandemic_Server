@@ -146,7 +146,8 @@ void Game::Start()
 	std::vector<PlayerRole> player_roles;
 	for (auto& player : players)
 	{
-		player->player_info->SetActions(0);
+		player->player_info->SetActions(99);
+		player->player_info->SetPosition(current_map->FindCityId("Atlanta"));
 		player->state = ClientState::CSTATE_GAME;
 		player_names.push_back(player->player_info->GetName());
 		player_roles.push_back(player->player_info->GetRole());

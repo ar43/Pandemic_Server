@@ -55,6 +55,17 @@ int Map::InfectionCardToCityId(InfectionCard infection_card)
 	return 0;
 }
 
+int Map::FindCityId(std::string name)
+{
+	for (auto& it : cities)
+	{
+		if (it.second->GetName() == name)
+			return it.second->GetId();
+	}
+	spdlog::error("Map::FindCityId: cant find city {}", name);
+	return 0;
+}
+
 void Map::ResetExplosions()
 {
 	for (auto& it: cities) 
