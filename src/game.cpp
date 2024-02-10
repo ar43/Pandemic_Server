@@ -62,9 +62,20 @@ void Game::SendLobbyPlayerCount()
 	Broadcast(msg);
 }
 
+void Game::Pause()
+{
+	paused = true;
+
+	for (auto i = 0; i < ready_table.size(); i++)
+	{
+		ready_table[i] = 0;
+	}
+}
+
 void Game::Update()
 {
 	ProcessClientMessages();
+	ProcessClientReady();
 
 	if (!IsInProgress())
 	{
@@ -73,11 +84,11 @@ void Game::Update()
 		if (lobby_player_count_timer->Tick())
 			SendLobbyPlayerCount();
 	}
-	else
+	else if(!paused)
 	{
 		if (players.size() != max_players)
 		{
-			Kill("player disconnected");
+			Stop("player disconnected");
 			return;
 		}
 
@@ -178,6 +189,7 @@ void Game::Start()
 	Broadcast(start_game_msg);
 
 	broadcast_positions = true;
+	Pause();
 }
 
 void Game::OnPlayerJoin(std::string player_name)
@@ -198,7 +210,7 @@ bool Game::RequestedKill()
 	return request_kill;
 }
 
-void Game::Kill(std::string reason)
+void Game::Stop(std::string reason)
 {
 	request_kill = true;
 	std::string str = std::string("Game killed - reason: ") + reason;
@@ -241,6 +253,31 @@ void Game::ProcessClientMessages()
 			}
 
 		}
+	}
+}
+
+void Game::ProcessClientReady()
+{
+	if (IsInProgress() && paused)
+	{
+		for (auto& player : players)
+		{
+			if (player->client_input->ready && ready_table[player->GetPid()] == 0)
+			{
+				ready_table[player->GetPid()] = 1;
+				spdlog::debug("player {}({}) is now ready", player->player_info->GetName(), player->GetPid());
+			}
+		}
+
+		int sum = 0;
+
+		for (int i = 0; i < max_players; i++)
+		{
+			sum += ready_table[i];
+		}
+
+		if (sum == max_players)
+			paused = false;
 	}
 }
 

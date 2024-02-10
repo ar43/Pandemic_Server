@@ -27,7 +27,7 @@ public:
 	void BroadcastPositions();
 	void Update();
 	void OnPlayerJoin(std::string player_name);
-	void Kill(std::string reason);
+	void Stop(std::string reason);
 	bool LoadMap(std::string map_name);
 	bool RequestedKill();
 	uint8_t GetId();
@@ -44,7 +44,9 @@ private:
 	void ValidateNames();
 	void Start();
 	void ProcessClientMessages();
+	void ProcessClientReady();
 	void SendLobbyPlayerCount();
+	void Pause();
 
 	void DrawInfectionCard(uint8_t infection_multiplier);
 	void DebugInfect(InfectionCard target_card);
@@ -53,11 +55,13 @@ private:
 	bool in_progress = false;
 	bool broadcast_positions = false;
 	bool request_kill = false;
+	bool paused = false;
 	
 	uint64_t ticks = 0;
 	uint8_t id;
 	uint8_t max_players;
 	std::array<uint8_t, MAX_PLAYERS> positions;
+	std::array<uint8_t, MAX_PLAYERS> ready_table;
 	std::unique_ptr<Map> current_map;
 	std::unique_ptr<CardStack> player_card_deck;
 	std::unique_ptr<CardStack> infection_card_deck;

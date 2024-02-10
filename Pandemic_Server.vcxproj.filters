@@ -120,6 +120,9 @@
     <ClCompile Include="src\out_trigger_infection.cpp">
       <Filter>Source Files\Opcodes\Out</Filter>
     </ClCompile>
+    <ClCompile Include="src\in_ready.cpp">
+      <Filter>Source Files\Opcodes\In</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\inc\server.h">
@@ -220,6 +223,9 @@
     </ClInclude>
     <ClInclude Include="src\inc\infection_type.h">
       <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\in_ready.h">
+      <Filter>Header Files\Opcodes\In</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

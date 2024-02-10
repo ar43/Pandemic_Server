@@ -16,6 +16,7 @@ struct ClientInput
 
 public:
 	bool requested_move = false;
+	bool ready = false;
 	uint8_t target_city = 0;
 
 	std::unique_ptr<std::pair<ClientMessageType, std::string>> client_message;
