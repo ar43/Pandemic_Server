@@ -162,6 +162,7 @@
     <ClCompile Include="src\out_trigger_infection.cpp" />
     <ClCompile Include="src\out_update_players.cpp" />
     <ClCompile Include="src\out_update_player_card.cpp" />
+    <ClCompile Include="src\out_update_turn.cpp" />
     <ClCompile Include="src\player_info.cpp" />
     <ClCompile Include="src\server.cpp" />
     <ClCompile Include="src\timer.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="src\inc\out_trigger_infection.h" />
     <ClInclude Include="src\inc\out_update_players.h" />
     <ClInclude Include="src\inc\out_update_player_card.h" />
+    <ClInclude Include="src\inc\out_update_turn.h" />
     <ClInclude Include="src\inc\player_card.h" />
     <ClInclude Include="src\inc\player_info.h" />
     <ClInclude Include="src\inc\player_role.h" />
@@ -201,6 +203,7 @@
     <ClInclude Include="src\inc\server_message_type.h" />
     <ClInclude Include="src\inc\server_opcode.h" />
     <ClInclude Include="src\inc\timer.h" />
+    <ClInclude Include="src\inc\turn_update_type.h" />
     <ClInclude Include="src\inc\utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -21,6 +21,7 @@
 #include <iostream>
 #include <array>
 #include <format>
+#include <out_update_turn.h>
 
 Game::Game(uint8_t max_players, uint8_t id, bool auto_restart)
 {
@@ -62,6 +63,46 @@ void Game::SendLobbyPlayerCount()
 	Broadcast(msg);
 }
 
+void Game::SwitchActivePlayerAfterPause(uint8_t id)
+{
+	pending_turn_switch = std::make_unique<uint8_t>(id);
+}
+
+void Game::CheckForPendingTurnSwitch()
+{
+	if (pending_turn_switch != nullptr)
+	{
+		auto player = GetPlayerById(*pending_turn_switch);
+		player->player_info->SetActions(player->player_info->GetMaxActions());
+		OutUpdateTurn update_turn(TurnUpdateType::TURN_BEGIN, player->GetPid(), player->player_info->GetActions());
+		Broadcast(update_turn);
+		active_player = player->GetPid();
+		pending_turn_switch = nullptr;
+	}
+}
+
+uint8_t Game::GetInfectionRate()
+{
+	switch (infection_stage)
+	{
+		case 0:
+		case 1:
+		case 2:
+		{
+			return 2;
+		}
+		case 3:
+		case 4:
+		{
+			return 3;
+		}
+		default:
+		{
+			return 4;
+		}
+	}
+}
+
 void Game::Pause()
 {
 	paused = true;
@@ -70,6 +111,47 @@ void Game::Pause()
 	{
 		ready_table[i] = 0;
 	}
+}
+
+void Game::CheckForTurnEnd()
+{
+	if (active_player >= 0)
+	{
+		auto player = GetPlayerById(active_player);
+		if (player->player_info->GetActions() == 0)
+		{
+			EndTurn();
+		}
+	}
+}
+
+void Game::EndTurn()
+{
+	auto player = GetPlayerById(active_player);
+	auto card_1 = player_card_deck->Draw();
+	auto card_2 = player_card_deck->Draw();
+
+	if (player->player_info->hand->GetSize() < 7)
+	{
+		player->player_info->hand->AddCard(player_card_deck->Draw());
+		OutUpdatePlayerCard out_update_player_card_1(player->GetPid(), false, 1, &card_1);
+		Broadcast(out_update_player_card_1);
+
+		player->player_info->hand->AddCard(player_card_deck->Draw());
+		OutUpdatePlayerCard out_update_player_card_2(player->GetPid(), false, 1, &card_2);
+		Broadcast(out_update_player_card_2);
+	}
+
+	for(int i = 0; i < GetInfectionRate(); i++)
+		DrawInfectionCard(1);
+
+	int next_player_id = (active_player + 1) % max_players;
+	SwitchActivePlayerAfterPause(next_player_id);
+
+	OutUpdateTurn update_turn(TurnUpdateType::TURN_END, player->GetPid(), 0);
+	Broadcast(update_turn);
+
+	Pause();
 }
 
 void Game::Update()
@@ -92,6 +174,8 @@ void Game::Update()
 			return;
 		}
 
+		CheckForPendingTurnSwitch();
+		CheckForTurnEnd();
 		ProcessInput();
 		UpdateGameState();
 		BroadcastPositions();
@@ -157,14 +241,15 @@ void Game::Start()
 	std::vector<PlayerRole> player_roles;
 	for (auto& player : players)
 	{
-		player->player_info->SetActions(99);
+		player->player_info->SetActions(0);
 		player->player_info->SetPosition(current_map->FindCityId("Atlanta"));
 		player->state = ClientState::CSTATE_GAME;
 		player_names.push_back(player->player_info->GetName());
 		player_roles.push_back(player->player_info->GetRole());
 
-		player->player_info->hand->AddCard(player_card_deck->Draw());
-		player->player_info->hand->AddCard(player_card_deck->Draw());
+		// deal number of cards based on num of players (6-num_players)
+		for(int i = 0; i < 6-max_players; i++)
+			player->player_info->hand->AddCard(player_card_deck->Draw());
 	}
 	for (auto& player : players)
 	{
@@ -189,6 +274,7 @@ void Game::Start()
 	Broadcast(start_game_msg);
 
 	broadcast_positions = true;
+	SwitchActivePlayerAfterPause(rng.uniform(0, (int)max_players-1));
 	Pause();
 }
 
@@ -340,6 +426,17 @@ void Game::InfectCity(int city_id, uint8_t card_id, InfectionType type, uint8_t 
 	}
 }
 
+Client* Game::GetPlayerById(uint8_t id)
+{
+	for (auto const& player : players)
+	{
+		if (player->GetPid() == id)
+			return player.get();
+	}
+	spdlog::error("Game::GetPlayerById - not found {}", id);
+	return nullptr;
+}
+
 void Game::ProcessInput()
 {
 	for (auto& player : players)
@@ -353,6 +450,8 @@ void Game::ProcessInput()
 				broadcast_positions = true;
 				player->player_info->SetPosition(client_input->target_city);
 				player->player_info->SetActions(player->player_info->GetActions() - 1);
+				OutUpdateTurn update_turn(TurnUpdateType::UPDATE_ACTIONS, player->GetPid(), player->player_info->GetActions());
+				Broadcast(update_turn);
 			}
 			client_input->requested_move = false;
 		}

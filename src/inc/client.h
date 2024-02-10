@@ -31,7 +31,7 @@ public:
 	void SendOutput();
 	void AddToLobby(int id);
 
-	uint8_t GetPid();
+	const uint8_t GetPid();
 	void SetPid(uint8_t pid);
 
 	int UpdateAwaiting();

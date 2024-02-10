@@ -12,6 +12,7 @@ public:
 	~PlayerInfo();
 
 	void SetActions(uint8_t new_actions);
+	uint8_t GetMaxActions();
 	uint8_t GetActions();
 
 	void SetName(std::string new_name);
@@ -29,5 +30,6 @@ private:
 	std::string name;
 	PlayerRole role;
 	uint8_t actions;
+	uint8_t max_actions;
 	uint8_t position;
 };

@@ -17,5 +17,6 @@ void ClientInput::Reset()
 	requested_move = false;
 	target_city = 0;
 	client_message = nullptr;
+	ready = false;
 }
 

@@ -123,6 +123,9 @@
     <ClCompile Include="src\in_ready.cpp">
       <Filter>Source Files\Opcodes\In</Filter>
     </ClCompile>
+    <ClCompile Include="src\out_update_turn.cpp">
+      <Filter>Source Files\Opcodes\Out</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\inc\server.h">
@@ -226,6 +229,12 @@
     </ClInclude>
     <ClInclude Include="src\inc\in_ready.h">
       <Filter>Header Files\Opcodes\In</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\out_update_turn.h">
+      <Filter>Header Files\Opcodes\Out</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\turn_update_type.h">
+      <Filter>Header Files\Enums</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

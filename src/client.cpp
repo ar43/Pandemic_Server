@@ -245,7 +245,7 @@ void Client::SendOutput()
 	spdlog::debug("SendOutput: bytes sent: {}", send_result);
 }
 
-uint8_t Client::GetPid()
+const uint8_t Client::GetPid()
 {
 	return pid;
 }

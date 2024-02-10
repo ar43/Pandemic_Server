@@ -22,6 +22,11 @@ void PlayerInfo::SetActions(uint8_t new_actions)
 	actions = new_actions;
 }
 
+uint8_t PlayerInfo::GetMaxActions()
+{
+	return max_actions;
+}
+
 uint8_t PlayerInfo::GetActions()
 {
 	return actions;
@@ -56,4 +61,5 @@ uint8_t PlayerInfo::GetPosition()
 void PlayerInfo::SetRole(PlayerRole new_role)
 {
 	role = new_role;
+	max_actions = 4;
 }
