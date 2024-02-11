@@ -24,4 +24,6 @@ public:
 
 	int num_actions;
 	bool invalid_opcode;
+
+	int discard_card_id;
 };

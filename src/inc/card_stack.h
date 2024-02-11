@@ -13,6 +13,7 @@ public:
 	uint8_t Draw();
 	void Shuffle();
 	size_t GetSize();
+	bool HasCard(uint8_t card_id);
 
 	uint8_t *GetPointer();
 

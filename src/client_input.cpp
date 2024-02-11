@@ -18,5 +18,6 @@ void ClientInput::Reset()
 	target_city = 0;
 	client_message = nullptr;
 	ready = false;
+	discard_card_id = -1;
 }
 

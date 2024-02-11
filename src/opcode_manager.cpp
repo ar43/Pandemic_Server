@@ -9,6 +9,7 @@
 #include "in_move.h"
 #include "in_ready.h"
 #include "in_client_message.h"
+#include <in_discard.h>
 
 OpcodeManager::OpcodeManager(std::shared_ptr<MsgManager> msg_manager)
 {
@@ -60,6 +61,7 @@ std::unique_ptr<OpcodeIn> OpcodeManager::GetOpcode(uint8_t id)
 		case ClientOpcode::MOVE: return std::make_unique<InMove>();
 		case ClientOpcode::CLIENT_MESSAGE: return std::make_unique<InClientMessage>();
 		case ClientOpcode::READY: return std::make_unique<InReady>();
+		case ClientOpcode::DISCARD: return std::make_unique<InDiscard>();
 		default: return std::make_unique<InError>();
 
 	}

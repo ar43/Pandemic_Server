@@ -26,14 +26,7 @@ uint8_t CardStack::AddCard(uint8_t card_id)
 
 void CardStack::RemoveCard(uint8_t card_id)
 {
-	for (auto it = stack.begin(); it != stack.end();)
-	{
-		if ((*it) == card_id)
-		{
-			it = stack.erase(it);
-			return;
-		}
-	}
+	stack.erase(std::remove(stack.begin(), stack.end(), card_id), stack.end());
 }
 
 uint8_t CardStack::Draw()
@@ -58,6 +51,11 @@ size_t CardStack::GetSize()
 	}
 
 	return stack.size();
+}
+
+bool CardStack::HasCard(uint8_t card_id)
+{
+	return std::find(stack.begin(), stack.end(), card_id) != stack.end();
 }
 
 uint8_t* CardStack::GetPointer()

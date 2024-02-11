@@ -147,6 +147,7 @@
     <ClCompile Include="src\client_input.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\in_client_message.cpp" />
+    <ClCompile Include="src\in_discard.cpp" />
     <ClCompile Include="src\in_error.cpp" />
     <ClCompile Include="src\in_idle.cpp" />
     <ClCompile Include="src\in_move.cpp" />
@@ -177,10 +178,12 @@
     <ClInclude Include="src\inc\client_message_type.h" />
     <ClInclude Include="src\inc\client_opcode.h" />
     <ClInclude Include="src\inc\client_state.h" />
+    <ClInclude Include="src\inc\end_turn_state.h" />
     <ClInclude Include="src\inc\game.h" />
     <ClInclude Include="src\inc\infection_card.h" />
     <ClInclude Include="src\inc\infection_type.h" />
     <ClInclude Include="src\inc\in_client_message.h" />
+    <ClInclude Include="src\inc\in_discard.h" />
     <ClInclude Include="src\inc\in_error.h" />
     <ClInclude Include="src\inc\in_idle.h" />
     <ClInclude Include="src\inc\in_move.h" />

@@ -9,6 +9,7 @@
 #include "randutils.hpp"
 #include "infection_type.h"
 #include "infection_card.h"
+#include "end_turn_state.h"
 
 class Client;
 class OpcodeOut;
@@ -51,7 +52,7 @@ private:
 	uint8_t GetInfectionRate();
 	void Pause();
 	void CheckForTurnEnd();
-	void EndTurn();
+	void ProcessEndTurn();
 
 	void DrawInfectionCard(uint8_t infection_multiplier);
 	void DebugInfect(InfectionCard target_card);
@@ -62,6 +63,8 @@ private:
 	bool broadcast_positions = false;
 	bool request_kill = false;
 	bool paused = false;
+	
+	EndTurnState end_turn_state = EndTurnState::STATE_NONE;
 	
 	uint64_t ticks = 0;
 	uint32_t turn_counter = 0;

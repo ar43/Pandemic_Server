@@ -6,4 +6,5 @@ enum class ClientOpcode
 	MOVE,
 	CLIENT_MESSAGE,
 	READY,
+	DISCARD
 };

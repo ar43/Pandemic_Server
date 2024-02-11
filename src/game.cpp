@@ -120,38 +120,88 @@ void Game::CheckForTurnEnd()
 		auto player = GetPlayerById(active_player);
 		if (player->player_info->GetActions() == 0)
 		{
-			EndTurn();
+			ProcessEndTurn();
+			end_turn_state = EndTurnState::STATE_DRAW_FIRST_CARD;
 		}
 	}
 }
 
-void Game::EndTurn()
+void Game::ProcessEndTurn()
 {
 	auto player = GetPlayerById(active_player);
-	auto card_1 = player_card_deck->Draw();
-	auto card_2 = player_card_deck->Draw();
 
-	if (player->player_info->hand->GetSize() < 7)
+	switch (end_turn_state)
 	{
-		player->player_info->hand->AddCard(player_card_deck->Draw());
-		OutUpdatePlayerCard out_update_player_card_1(player->GetPid(), false, 1, &card_1);
-		Broadcast(out_update_player_card_1);
+		case EndTurnState::STATE_DRAW_FIRST_CARD:
+		{
+			auto card = player_card_deck->Draw();
+			OutUpdatePlayerCard out_update_player_card(player->GetPid(), false, 1, &card);
+			Broadcast(out_update_player_card);
+			player->player_info->hand->AddCard(card);
+			if (player->player_info->hand->GetSize() > 7)
+				end_turn_state = EndTurnState::STATE_WAIT_FOR_FIRST_DISCARD;
+			else
+				end_turn_state = EndTurnState::STATE_DRAW_SECOND_CARD;
+			break;
+		}
+		case EndTurnState::STATE_WAIT_FOR_FIRST_DISCARD:
+		{
+			if (player->client_input->discard_card_id >= 0)
+			{
+				auto card = (uint8_t)player->client_input->discard_card_id;
+				if (player->player_info->hand->HasCard(card))
+				{
+					player->player_info->hand->RemoveCard(card);
+					OutUpdatePlayerCard out_update_player_card(player->GetPid(), true, 1, &card);
+					Broadcast(out_update_player_card);
+					end_turn_state = EndTurnState::STATE_DRAW_SECOND_CARD;
+				}
+			}
+			break;
+		}
+		case EndTurnState::STATE_WAIT_FOR_SECOND_DISCARD:
+		{
+			if (player->client_input->discard_card_id >= 0)
+			{
+				auto card = (uint8_t)player->client_input->discard_card_id;
+				if (player->player_info->hand->HasCard(card))
+				{
+					player->player_info->hand->RemoveCard(card);
+					OutUpdatePlayerCard out_update_player_card(player->GetPid(), true, 1, &card);
+					Broadcast(out_update_player_card);
+					end_turn_state = EndTurnState::STATE_DO_INFECTIONS;
+				}
+			}
+			break;
+		}
+		case EndTurnState::STATE_DRAW_SECOND_CARD:
+		{
+			auto card = player_card_deck->Draw();
+			OutUpdatePlayerCard out_update_player_card(player->GetPid(), false, 1, &card);
+			Broadcast(out_update_player_card);
+			player->player_info->hand->AddCard(card);
+			if (player->player_info->hand->GetSize() > 7)
+				end_turn_state = EndTurnState::STATE_WAIT_FOR_SECOND_DISCARD;
+			else
+				end_turn_state = EndTurnState::STATE_DO_INFECTIONS;
+			break;
+		}
+		case EndTurnState::STATE_DO_INFECTIONS:
+		{
+			for(int i = 0; i < GetInfectionRate(); i++)
+				DrawInfectionCard(1);
 
-		player->player_info->hand->AddCard(player_card_deck->Draw());
-		OutUpdatePlayerCard out_update_player_card_2(player->GetPid(), false, 1, &card_2);
-		Broadcast(out_update_player_card_2);
+			int next_player_id = (active_player + 1) % max_players;
+			SwitchActivePlayerAfterPause(next_player_id);
+
+			OutUpdateTurn update_turn(TurnUpdateType::TURN_END, player->GetPid(), 0);
+			Broadcast(update_turn);
+
+			Pause();
+			end_turn_state = EndTurnState::STATE_NONE;
+			break;
+		}
 	}
-
-	for(int i = 0; i < GetInfectionRate(); i++)
-		DrawInfectionCard(1);
-
-	int next_player_id = (active_player + 1) % max_players;
-	SwitchActivePlayerAfterPause(next_player_id);
-
-	OutUpdateTurn update_turn(TurnUpdateType::TURN_END, player->GetPid(), 0);
-	Broadcast(update_turn);
-
-	Pause();
 }
 
 void Game::Update()
@@ -166,7 +216,7 @@ void Game::Update()
 		if (lobby_player_count_timer->Tick())
 			SendLobbyPlayerCount();
 	}
-	else if(!paused)
+	else
 	{
 		if (players.size() != max_players)
 		{
@@ -174,13 +224,23 @@ void Game::Update()
 			return;
 		}
 
-		CheckForPendingTurnSwitch();
-		CheckForTurnEnd();
-		ProcessInput();
-		UpdateGameState();
-		BroadcastPositions();
+		if (!paused)
+		{
+			if (end_turn_state != EndTurnState::STATE_NONE)
+			{
+				ProcessEndTurn();
+			}
+			else
+			{
+				CheckForPendingTurnSwitch();
+				CheckForTurnEnd();
+				ProcessInput();
+				UpdateGameState();
+				BroadcastPositions();
+			}
 
-		ticks++;
+			ticks++;
+		}
 	}
 }
 
