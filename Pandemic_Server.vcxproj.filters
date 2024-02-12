@@ -46,6 +46,12 @@
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{2cb01a26-3c91-4cd5-a48b-8a937849b679}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Enums\Shared">
+      <UniqueIdentifier>{2186e8ad-8d69-4c4a-ab83-6a2835213146}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Enums\Server">
+      <UniqueIdentifier>{b4b3698c-6802-41be-bb7d-6d2e44452359}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\server.cpp">
@@ -129,6 +135,9 @@
     <ClCompile Include="src\in_discard.cpp">
       <Filter>Source Files\Opcodes\In</Filter>
     </ClCompile>
+    <ClCompile Include="src\out_trigger_epidemic.cpp">
+      <Filter>Source Files\Opcodes\Out</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\inc\server.h">
@@ -170,17 +179,8 @@
     <ClInclude Include="src\inc\out_begin_game.h">
       <Filter>Header Files\Opcodes\Out</Filter>
     </ClInclude>
-    <ClInclude Include="src\inc\server_message_type.h">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="src\inc\client_message_type.h">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
     <ClInclude Include="src\inc\in_client_message.h">
       <Filter>Header Files\Opcodes\In</Filter>
-    </ClInclude>
-    <ClInclude Include="src\inc\client_state.h">
-      <Filter>Header Files\Enums</Filter>
     </ClInclude>
     <ClInclude Include="src\inc\game.h">
       <Filter>Header Files\Game</Filter>
@@ -194,23 +194,11 @@
     <ClInclude Include="src\inc\player_info.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="src\inc\player_role.h">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
     <ClInclude Include="src\inc\utility.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="src\inc\timer.h">
       <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\inc\server_opcode.h">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="src\inc\client_opcode.h">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="src\inc\player_card.h">
-      <Filter>Header Files\Enums</Filter>
     </ClInclude>
     <ClInclude Include="src\inc\card_stack.h">
       <Filter>Header Files\Utils</Filter>
@@ -218,17 +206,8 @@
     <ClInclude Include="src\inc\out_update_player_card.h">
       <Filter>Header Files\Opcodes\Out</Filter>
     </ClInclude>
-    <ClInclude Include="src\inc\city_color.h">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="src\inc\infection_card.h">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
     <ClInclude Include="src\inc\out_trigger_infection.h">
       <Filter>Header Files\Opcodes\Out</Filter>
-    </ClInclude>
-    <ClInclude Include="src\inc\infection_type.h">
-      <Filter>Header Files\Enums</Filter>
     </ClInclude>
     <ClInclude Include="src\inc\in_ready.h">
       <Filter>Header Files\Opcodes\In</Filter>
@@ -236,14 +215,47 @@
     <ClInclude Include="src\inc\out_update_turn.h">
       <Filter>Header Files\Opcodes\Out</Filter>
     </ClInclude>
-    <ClInclude Include="src\inc\turn_update_type.h">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="src\inc\end_turn_state.h">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
     <ClInclude Include="src\inc\in_discard.h">
       <Filter>Header Files\Opcodes\In</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\city_color.h">
+      <Filter>Header Files\Enums\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\client_message_type.h">
+      <Filter>Header Files\Enums\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\client_opcode.h">
+      <Filter>Header Files\Enums\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\client_state.h">
+      <Filter>Header Files\Enums\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\end_turn_state.h">
+      <Filter>Header Files\Enums\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\infection_card.h">
+      <Filter>Header Files\Enums\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\infection_type.h">
+      <Filter>Header Files\Enums\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\player_card.h">
+      <Filter>Header Files\Enums\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\player_role.h">
+      <Filter>Header Files\Enums\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\server_message_type.h">
+      <Filter>Header Files\Enums\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\server_opcode.h">
+      <Filter>Header Files\Enums\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\turn_update_type.h">
+      <Filter>Header Files\Enums\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\out_trigger_epidemic.h">
+      <Filter>Header Files\Opcodes\Out</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

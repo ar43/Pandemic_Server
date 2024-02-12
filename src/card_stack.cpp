@@ -26,14 +26,29 @@ uint8_t CardStack::AddCard(uint8_t card_id)
 
 void CardStack::RemoveCard(uint8_t card_id)
 {
-	stack.erase(std::remove(stack.begin(), stack.end(), card_id), stack.end());
+	auto iter = std::find(stack.begin(), stack.end(), card_id);
+	if (iter != stack.end())
+	{
+		stack.erase(iter);
+	}
 }
 
-uint8_t CardStack::Draw()
+uint8_t CardStack::Draw(bool bottom)
 {
-	uint8_t ret = stack.back();
-	stack.pop_back();
-	return ret;
+	if (GetSize() == 0)
+		throw std::out_of_range("CardStack::Draw");
+	if (!bottom)
+	{
+		uint8_t ret = stack.back();
+		stack.pop_back();
+		return ret;
+	}
+	else
+	{
+		uint8_t ret = stack.front();
+		stack.erase(stack.begin());
+		return ret;
+	}
 }
 
 void CardStack::Shuffle()
@@ -56,6 +71,46 @@ size_t CardStack::GetSize()
 bool CardStack::HasCard(uint8_t card_id)
 {
 	return std::find(stack.begin(), stack.end(), card_id) != stack.end();
+}
+
+void CardStack::Split(std::unique_ptr<CardStack> &bottom, std::unique_ptr<CardStack> &top)
+{
+	if (stack.size() < 2)
+	{
+		spdlog::error("CardStack::Split - stack.size() < 2");
+		return;
+	}
+
+	for (size_t i = 0; i < stack.size(); i++)
+	{
+		if (i < stack.size() / 2)
+		{
+			bottom->AddCard(stack.at(i));
+		}
+		else
+		{
+			top->AddCard(stack.at(i));
+		}
+	}
+}
+
+void CardStack::Combine(std::unique_ptr<CardStack>& other, bool put_on_top)
+{
+	size_t original_size = other->GetSize();
+	if (put_on_top)
+	{
+		for (size_t i = 0; i < original_size; i++)
+		{
+			AddCard(other->Draw(true));
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < original_size; i++)
+		{
+			stack.insert(stack.begin(), other->Draw());
+		}
+	}
 }
 
 uint8_t* CardStack::GetPointer()

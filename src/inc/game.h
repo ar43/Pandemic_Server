@@ -39,9 +39,11 @@ public:
 
 private:
 	void UpdateGameState();
+	void PreparePlayerCardDeck();
 	void ProcessInput();
 	void Broadcast(OpcodeOut& opcode);
 	void GenerateRoles();
+	void PlayersLose();
 	void ValidateNames();
 	void Start();
 	void ProcessClientMessages();
@@ -49,12 +51,13 @@ private:
 	void SendLobbyPlayerCount();
 	void SwitchActivePlayerAfterPause(uint8_t id);
 	void CheckForPendingTurnSwitch();
-	uint8_t GetInfectionRate();
+	uint8_t GetInfectionStage();
 	void Pause();
 	void CheckForTurnEnd();
 	void ProcessEndTurn();
+	void AddInfectionRate();
 
-	void DrawInfectionCard(uint8_t infection_multiplier);
+	void DrawInfectionCard(uint8_t infection_multiplier, bool bottom = false);
 	void DebugInfect(InfectionCard target_card);
 	void InfectCity(int city_id, uint8_t card_id, InfectionType type, uint8_t infection_multiplier, std::vector<std::pair<uint8_t, uint8_t>> &infection_data);
 	Client *GetPlayerById(uint8_t id);
@@ -65,10 +68,12 @@ private:
 	bool paused = false;
 	
 	EndTurnState end_turn_state = EndTurnState::STATE_NONE;
+
+	const double EPIDEMIC_DELAY = 2000.0;
 	
 	uint64_t ticks = 0;
 	uint32_t turn_counter = 0;
-	uint8_t infection_stage = 0;
+	uint8_t infection_rate = 0;
 	uint8_t id;
 	uint8_t max_players;
 	int active_player = -1;
@@ -81,5 +86,6 @@ private:
 	std::unique_ptr<CardStack> infection_card_discard_pile;
 	std::unique_ptr<Timer> game_begin_timer;
 	std::unique_ptr<Timer> lobby_player_count_timer;
+	std::unique_ptr<Timer> epidemic_timer;
 	randutils::mt19937_rng rng;
 };

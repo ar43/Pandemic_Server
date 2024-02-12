@@ -160,6 +160,7 @@
     <ClCompile Include="src\opcode_out.cpp" />
     <ClCompile Include="src\out_begin_game.cpp" />
     <ClCompile Include="src\out_server_message.cpp" />
+    <ClCompile Include="src\out_trigger_epidemic.cpp" />
     <ClCompile Include="src\out_trigger_infection.cpp" />
     <ClCompile Include="src\out_update_players.cpp" />
     <ClCompile Include="src\out_update_player_card.cpp" />
@@ -195,6 +196,7 @@
     <ClInclude Include="src\inc\opcode_out.h" />
     <ClInclude Include="src\inc\out_begin_game.h" />
     <ClInclude Include="src\inc\out_server_message.h" />
+    <ClInclude Include="src\inc\out_trigger_epidemic.h" />
     <ClInclude Include="src\inc\out_trigger_infection.h" />
     <ClInclude Include="src\inc\out_update_players.h" />
     <ClInclude Include="src\inc\out_update_player_card.h" />

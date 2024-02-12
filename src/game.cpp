@@ -17,6 +17,7 @@
 #include "out_update_player_card.h"
 #include "infection_card.h"
 #include "out_trigger_infection.h"
+#include "out_trigger_epidemic.h"
 
 #include <iostream>
 #include <array>
@@ -31,11 +32,12 @@ Game::Game(uint8_t max_players, uint8_t id, bool auto_restart)
 	this->auto_restart = auto_restart;
 	this->in_progress = false;
 	game_begin_timer = std::make_unique<Timer>();
-	player_card_deck = std::make_unique<CardStack>((uint8_t)(PlayerCard::NUM_PLAYER_CARDS));
+	PreparePlayerCardDeck();
 	infection_card_deck = std::make_unique<CardStack>((uint8_t)(InfectionCard::NUM_INFECTION_CARDS));
 	infection_card_discard_pile = std::make_unique<CardStack>(0);
 	lobby_player_count_timer = std::make_unique <Timer>();
 	lobby_player_count_timer->Start(1000.0, true);
+	epidemic_timer = std::make_unique<Timer>();
 }
 
 Game::~Game()
@@ -81,9 +83,9 @@ void Game::CheckForPendingTurnSwitch()
 	}
 }
 
-uint8_t Game::GetInfectionRate()
+uint8_t Game::GetInfectionStage()
 {
-	switch (infection_stage)
+	switch (infection_rate)
 	{
 		case 0:
 		case 1:
@@ -107,7 +109,7 @@ void Game::Pause()
 {
 	paused = true;
 
-	for (auto i = 0; i < ready_table.size(); i++)
+	for (size_t i = 0; i < ready_table.size(); i++)
 	{
 		ready_table[i] = 0;
 	}
@@ -129,26 +131,47 @@ void Game::CheckForTurnEnd()
 void Game::ProcessEndTurn()
 {
 	auto player = GetPlayerById(active_player);
+	uint8_t card;
 
 	switch (end_turn_state)
 	{
 		case EndTurnState::STATE_DRAW_FIRST_CARD:
 		{
-			auto card = player_card_deck->Draw();
-			OutUpdatePlayerCard out_update_player_card(player->GetPid(), false, 1, &card);
-			Broadcast(out_update_player_card);
-			player->player_info->hand->AddCard(card);
-			if (player->player_info->hand->GetSize() > 7)
-				end_turn_state = EndTurnState::STATE_WAIT_FOR_FIRST_DISCARD;
+			try 
+			{
+				card = player_card_deck->Draw();
+			}
+			catch (std::out_of_range& e)
+			{
+				(void)e;
+				PlayersLose();
+				return;
+			}
+
+			if (card == (uint8_t)PlayerCard::EPIDEMIC)
+			{
+				epidemic_timer->Start(EPIDEMIC_DELAY, false);
+				OutTriggerEpidemic out_trigger_epidemic(0);
+				Broadcast(out_trigger_epidemic);
+				end_turn_state = EndTurnState::STATE_FIRST_EPIDEMIC;
+			}
 			else
-				end_turn_state = EndTurnState::STATE_DRAW_SECOND_CARD;
+			{
+				OutUpdatePlayerCard out_update_player_card(player->GetPid(), false, 1, &card);
+				Broadcast(out_update_player_card);
+				player->player_info->hand->AddCard(card);
+				if (player->player_info->hand->GetSize() > 7)
+					end_turn_state = EndTurnState::STATE_WAIT_FOR_FIRST_DISCARD;
+				else
+					end_turn_state = EndTurnState::STATE_DRAW_SECOND_CARD;
+			}
 			break;
 		}
 		case EndTurnState::STATE_WAIT_FOR_FIRST_DISCARD:
 		{
 			if (player->client_input->discard_card_id >= 0)
 			{
-				auto card = (uint8_t)player->client_input->discard_card_id;
+				card = (uint8_t)player->client_input->discard_card_id;
 				if (player->player_info->hand->HasCard(card))
 				{
 					player->player_info->hand->RemoveCard(card);
@@ -163,7 +186,7 @@ void Game::ProcessEndTurn()
 		{
 			if (player->client_input->discard_card_id >= 0)
 			{
-				auto card = (uint8_t)player->client_input->discard_card_id;
+				card = (uint8_t)player->client_input->discard_card_id;
 				if (player->player_info->hand->HasCard(card))
 				{
 					player->player_info->hand->RemoveCard(card);
@@ -176,19 +199,65 @@ void Game::ProcessEndTurn()
 		}
 		case EndTurnState::STATE_DRAW_SECOND_CARD:
 		{
-			auto card = player_card_deck->Draw();
-			OutUpdatePlayerCard out_update_player_card(player->GetPid(), false, 1, &card);
-			Broadcast(out_update_player_card);
-			player->player_info->hand->AddCard(card);
-			if (player->player_info->hand->GetSize() > 7)
-				end_turn_state = EndTurnState::STATE_WAIT_FOR_SECOND_DISCARD;
+			try 
+			{
+				card = player_card_deck->Draw();
+			}
+			catch (std::out_of_range& e)
+			{
+				(void)e;
+				PlayersLose();
+				return;
+			}
+
+			if (card == (uint8_t)PlayerCard::EPIDEMIC)
+			{
+				epidemic_timer->Start(EPIDEMIC_DELAY, false);
+				OutTriggerEpidemic out_trigger_epidemic(0);
+				Broadcast(out_trigger_epidemic);
+				end_turn_state = EndTurnState::STATE_SECOND_EPIDEMIC;
+			}
 			else
+			{
+				OutUpdatePlayerCard out_update_player_card(player->GetPid(), false, 1, &card);
+				Broadcast(out_update_player_card);
+				player->player_info->hand->AddCard(card);
+				if (player->player_info->hand->GetSize() > 7)
+					end_turn_state = EndTurnState::STATE_WAIT_FOR_SECOND_DISCARD;
+				else
+					end_turn_state = EndTurnState::STATE_DO_INFECTIONS;
+			}
+			break;
+		}
+		case EndTurnState::STATE_FIRST_EPIDEMIC:
+		{
+			if (epidemic_timer->Tick())
+			{
+				AddInfectionRate();
+				DrawInfectionCard(3, true);
+				infection_card_discard_pile->Shuffle();
+				infection_card_deck->Combine(infection_card_discard_pile, true);
+				infection_card_discard_pile = std::make_unique<CardStack>(0);
+				end_turn_state = EndTurnState::STATE_DRAW_SECOND_CARD;
+			}
+			break;
+		}
+		case EndTurnState::STATE_SECOND_EPIDEMIC:
+		{
+			if (epidemic_timer->Tick())
+			{
+				AddInfectionRate();
+				DrawInfectionCard(3, true);
+				infection_card_discard_pile->Shuffle();
+				infection_card_deck->Combine(infection_card_discard_pile, true);
+				infection_card_discard_pile = std::make_unique<CardStack>(0);
 				end_turn_state = EndTurnState::STATE_DO_INFECTIONS;
+			}
 			break;
 		}
 		case EndTurnState::STATE_DO_INFECTIONS:
 		{
-			for(int i = 0; i < GetInfectionRate(); i++)
+			for(int i = 0; i < GetInfectionStage(); i++)
 				DrawInfectionCard(1);
 
 			int next_player_id = (active_player + 1) % max_players;
@@ -202,6 +271,11 @@ void Game::ProcessEndTurn()
 			break;
 		}
 	}
+}
+
+void Game::AddInfectionRate()
+{
+	infection_rate++;
 }
 
 void Game::Update()
@@ -265,6 +339,11 @@ void Game::GenerateRoles()
 		player->player_info->SetRole((PlayerRole)role_list.at(num));
 		role_list.erase(role_list.begin()+num);
 	}
+}
+
+void Game::PlayersLose()
+{
+	Stop("Players lost! TODO");
 }
 
 void Game::ValidateNames()
@@ -383,6 +462,27 @@ void Game::UpdateGameState()
 	}
 }
 
+void Game::PreparePlayerCardDeck()
+{
+	std::unique_ptr<CardStack> temp_stack[6];
+	for (int i = 0; i < 6; i++)
+	{
+		temp_stack[i] = std::make_unique<CardStack>(0);
+	}
+	player_card_deck = std::make_unique<CardStack>((uint8_t)(PlayerCard::NUM_PLAYER_CARDS));
+	player_card_deck->Split(temp_stack[4], temp_stack[5]);
+	temp_stack[4]->Split(temp_stack[0], temp_stack[1]);
+	temp_stack[5]->Split(temp_stack[2], temp_stack[3]);
+
+	player_card_deck = std::make_unique<CardStack>(0);
+	for (int i = 0; i < 4; i++)
+	{
+		temp_stack[i]->AddCard((uint8_t)PlayerCard::EPIDEMIC);
+		temp_stack[i]->Shuffle();
+		player_card_deck->Combine(temp_stack[i], true);
+	}
+}
+
 void Game::ProcessClientMessages()
 {
 	for (auto& player : players)
@@ -443,7 +543,7 @@ void Game::DebugInfect(InfectionCard target_card)
 	Broadcast(packet);
 }
 
-void Game::DrawInfectionCard(uint8_t infection_multiplier)
+void Game::DrawInfectionCard(uint8_t infection_multiplier, bool bottom)
 {
 	if (infection_multiplier <= 0 || infection_multiplier > 3)
 	{
@@ -452,7 +552,7 @@ void Game::DrawInfectionCard(uint8_t infection_multiplier)
 	}
 
 	std::vector<std::pair<uint8_t, uint8_t>> infection_data;
-	auto card = infection_card_deck->Draw();
+	auto card = infection_card_deck->Draw(bottom);
 	auto city_id = current_map->InfectionCardToCityId((InfectionCard)card);
 	InfectionType type = current_map->GetInfectionTypeFromCity(city_id);
 
