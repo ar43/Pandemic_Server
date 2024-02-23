@@ -86,6 +86,6 @@ private:
 	std::unique_ptr<CardStack> infection_card_discard_pile;
 	std::unique_ptr<Timer> game_begin_timer;
 	std::unique_ptr<Timer> lobby_player_count_timer;
-	std::unique_ptr<Timer> epidemic_timer;
+	std::unique_ptr<Timer> epidemic_timer[2];
 	randutils::mt19937_rng rng;
 };
