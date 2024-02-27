@@ -2,6 +2,7 @@
 #include <chrono>
 #include <ctime>
 #include <ratio>
+#include <thread>
 
 namespace util
 {
@@ -18,7 +19,7 @@ namespace util
 
 		while (seconds > estimate) {
 			auto start = high_resolution_clock::now();
-			this_thread::sleep_for(milliseconds(1));
+			std::this_thread::sleep_for(milliseconds(1));
 			auto end = high_resolution_clock::now();
 
 			double observed = (end - start).count() / 1e9;
