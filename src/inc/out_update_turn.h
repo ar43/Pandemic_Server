@@ -10,7 +10,8 @@ public:
 	OutUpdateTurn(TurnUpdateType turn_update_type, uint8_t pid, uint8_t actions);
 	~OutUpdateTurn();
 
-	void Send(std::shared_ptr<MsgManager> const& msg_manager);
+protected:
+	void WriteBody(std::shared_ptr<MsgManager> const& msg_manager);
 private:
 	TurnUpdateType turn_update_type;
 	uint8_t pid, actions;

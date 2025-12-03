@@ -51,7 +51,6 @@ private:
 	uint64_t ticks = 0;
 	uint8_t pid;
 	randutils::mt19937_rng rng;
-	uint32_t current_region = 0;
 
 	std::queue<char> input;
 	std::queue<char> output;

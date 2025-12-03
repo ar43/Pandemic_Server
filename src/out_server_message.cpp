@@ -11,9 +11,8 @@ OutServerMessage::~OutServerMessage()
 {
 }
 
-void OutServerMessage::Send(std::shared_ptr<MsgManager> const& msg_manager)
+void OutServerMessage::WriteBody(std::shared_ptr<MsgManager> const& msg_manager)
 {
-	msg_manager->WriteOpcode(GetId());
 	auto len = (uint16_t)(msg.length());
 	msg_manager->WriteByte((uint8_t)server_message_type);
 	msg_manager->WriteShort(len);

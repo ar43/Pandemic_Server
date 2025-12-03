@@ -12,6 +12,11 @@ public:
 
 	void InitEncryption(uint64_t client_session_key, uint64_t server_session_key);
 
+	void ClearTempOutput();
+	void MergeOutput();
+
+	void SendRawByte(uint8_t value);
+
 	uint8_t ReadByte();
 	uint8_t ReadOpcode();
 	uint16_t ReadShort();
@@ -42,7 +47,8 @@ private:
 	//std::unique_ptr<Encryption> packetDecryption;
 	std::queue<char> bit_queue;
 	std::queue<char> *input;
-	std::queue<char> *output;
+	std::queue<char> *outputFinal;
+	std::deque<char> output;
 	
 	bool error = false;
 };

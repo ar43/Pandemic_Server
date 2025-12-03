@@ -11,7 +11,8 @@ public:
 	OutBeginGame(uint8_t num_players, uint8_t player_id, std::vector<std::string> *player_names, std::vector<PlayerRole> *player_roles);
 	~OutBeginGame();
 
-	void Send(std::shared_ptr<MsgManager> const& msg_manager);
+protected:
+	void WriteBody(std::shared_ptr<MsgManager> const& msg_manager);
 private:
 	std::vector<std::string> *player_names;
 	std::vector<PlayerRole> *player_roles;

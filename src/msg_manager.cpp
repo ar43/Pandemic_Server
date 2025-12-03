@@ -5,7 +5,7 @@
 MsgManager::MsgManager(std::queue<char>* input, std::queue<char>* output)
 {
 	this->input = input;
-	this->output = output;
+	this->outputFinal = output;
 }
 
 MsgManager::~MsgManager() = default;
@@ -15,6 +15,27 @@ void MsgManager::InitEncryption(uint64_t client_session_key, uint64_t server_ses
 	//packetDecryption = std::make_unique<Encryption>(client_session_key, server_session_key, true);
 	//printf("!!!!decryption: %llx %llx\n", client_session_key, server_session_key);
 	//packetEncryption = std::make_unique<Encryption>(client_session_key, server_session_key, false);
+}
+
+void MsgManager::ClearTempOutput()
+{
+	output.clear();
+}
+
+void MsgManager::MergeOutput()
+{
+	while (!output.empty())
+	{
+		outputFinal->push(output.front());
+		output.pop_front();
+	}
+}
+
+void MsgManager::SendRawByte(uint8_t value)
+{
+	ClearTempOutput();
+	WriteByte(value);
+	MergeOutput();
 }
 
 uint8_t MsgManager::ReadByte()
@@ -87,19 +108,19 @@ void MsgManager::ReadDiscard(int num)
 
 void MsgManager::WriteByte(uint8_t value)
 {
-	output->push(value);
+	output.push_back(value);
 }
 
 void MsgManager::WriteOpcode(uint8_t op)
 {
-	WriteByte((op) & 0xFF);
+	output.push_front(op);
 }
 
 void MsgManager::WriteNull(int len)
 {
 	for (int i = 0; i < len; i++)
 	{
-		output->push(0);
+		output.push_back(0);
 	}
 }
 
@@ -124,7 +145,7 @@ void MsgManager::WriteLong(uint64_t num)
 		int current = 7 - i;
 		uint8_t curr_byte = (uint8_t)((num >> (current * 8)) & 0xff);
 		//printf("curr_byte: %d\n", curr_byte);
-		output->push(curr_byte);
+		output.push_back(curr_byte);
 	}
 }
 

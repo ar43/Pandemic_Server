@@ -10,7 +10,8 @@ public:
 	OutServerMessage(ServerMessageType server_message_type, std::string msg);
 	~OutServerMessage();
 
-	void Send(std::shared_ptr<MsgManager> const& msg_manager);
+protected:
+	void WriteBody(std::shared_ptr<MsgManager> const& msg_manager);
 private:
 	std::string msg;
 	ServerMessageType server_message_type;

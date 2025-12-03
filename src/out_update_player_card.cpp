@@ -13,9 +13,8 @@ OutUpdatePlayerCard::~OutUpdatePlayerCard()
 {
 }
 
-void OutUpdatePlayerCard::Send(std::shared_ptr<MsgManager> const& msg_manager)
+void OutUpdatePlayerCard::WriteBody(std::shared_ptr<MsgManager> const& msg_manager)
 {
-	msg_manager->WriteOpcode(GetId());
 	msg_manager->WriteByte(pid);
 	msg_manager->WriteByte((uint8_t)remove);
 	msg_manager->WriteByte(num_cards);

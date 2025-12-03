@@ -10,7 +10,8 @@ public:
 	OutUpdatePlayerCard(uint8_t pid, bool remove, uint8_t num_cards, uint8_t* cards);
 	~OutUpdatePlayerCard();
 
-	void Send(std::shared_ptr<MsgManager> const& msg_manager);
+protected:
+	void WriteBody(std::shared_ptr<MsgManager> const& msg_manager);
 private:
 	uint8_t pid;
 	bool remove;

@@ -13,9 +13,8 @@ OutUpdateTurn::~OutUpdateTurn()
 {
 }
 
-void OutUpdateTurn::Send(std::shared_ptr<MsgManager> const& msg_manager)
+void OutUpdateTurn::WriteBody(std::shared_ptr<MsgManager> const& msg_manager)
 {
-	msg_manager->WriteOpcode(GetId());
 	msg_manager->WriteByte((uint8_t)turn_update_type);
 	msg_manager->WriteByte(pid);
 	msg_manager->WriteByte(actions);

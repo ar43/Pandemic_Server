@@ -11,8 +11,11 @@ public:
 	OpcodeOut(ServerOpcode id);
 	~OpcodeOut();
 
-	virtual void Send(std::shared_ptr<MsgManager> const& msg_manager) = 0;
+	void Send(std::shared_ptr<MsgManager> const& msg_manager);
 	uint8_t GetId();
+protected:
+	virtual void WriteBody(std::shared_ptr<MsgManager> const& msg_manager) = 0;
 private:
 	ServerOpcode id;
+	void WriteHeader(std::shared_ptr<MsgManager> const& msg_manager);
 };

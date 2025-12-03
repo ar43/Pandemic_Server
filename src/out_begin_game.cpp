@@ -14,11 +14,10 @@ OutBeginGame::~OutBeginGame()
 {
 }
 
-void OutBeginGame::Send(std::shared_ptr<MsgManager> const& msg_manager)
+void OutBeginGame::WriteBody(std::shared_ptr<MsgManager> const& msg_manager)
 {
-	msg_manager->WriteOpcode(GetId());
-	msg_manager->WriteOpcode(this->num_players);
-	msg_manager->WriteOpcode(this->player_id);
+	msg_manager->WriteByte(this->num_players);
+	msg_manager->WriteByte(this->player_id);
 	for (size_t i = 0; i < this->num_players; i++)
 	{
 		auto name_len = (uint8_t)player_names->at(i).length();

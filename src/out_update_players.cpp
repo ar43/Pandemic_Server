@@ -14,9 +14,8 @@ OutUpdatePlayers::~OutUpdatePlayers()
 {
 }
 
-void OutUpdatePlayers::Send(std::shared_ptr<MsgManager> const& msg_manager)
+void OutUpdatePlayers::WriteBody(std::shared_ptr<MsgManager> const& msg_manager)
 {
-	msg_manager->WriteOpcode(GetId());
 	msg_manager->WriteByte(num_players);
 	for (int i = 0; i < num_players; i++)
 	{

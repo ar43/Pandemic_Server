@@ -8,7 +8,8 @@ public:
 	OutTriggerEpidemic(int temp);
 	~OutTriggerEpidemic();
 
-	void Send(std::shared_ptr<MsgManager> const& msg_manager);
+protected:
+	void WriteBody(std::shared_ptr<MsgManager> const& msg_manager);
 private:
 	int temp;
 };

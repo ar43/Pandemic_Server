@@ -11,7 +11,6 @@ OutTriggerEpidemic::~OutTriggerEpidemic()
 {
 }
 
-void OutTriggerEpidemic::Send(std::shared_ptr<MsgManager> const& msg_manager)
+void OutTriggerEpidemic::WriteBody(std::shared_ptr<MsgManager> const& msg_manager)
 {
-	msg_manager->WriteOpcode(GetId());
 }

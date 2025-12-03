@@ -12,7 +12,8 @@ public:
 	OutTriggerInfection(uint8_t card_id, std::vector<std::pair<uint8_t, uint8_t>> &infection_data);
 	~OutTriggerInfection();
 
-	void Send(std::shared_ptr<MsgManager> const& msg_manager);
+protected:
+	void WriteBody(std::shared_ptr<MsgManager> const& msg_manager);
 private:
 	uint8_t card_id;
 	std::vector<std::pair<uint8_t, uint8_t>>& infection_data;

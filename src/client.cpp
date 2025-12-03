@@ -60,7 +60,7 @@ void Client::Drop(std::string reason)
 void Client::AddToLobby(int id)
 {
 	state = ClientState::CSTATE_LOBBY;
-	msg_manager->WriteByte(0);
+	msg_manager->SendRawByte(0);
 	timeout_timer->Start(TIMEOUT_TIME,false);
 }
 
@@ -72,7 +72,7 @@ int Client::UpdateAwaiting()
 	if (awaiting_substate == 0)
 	{
 		spdlog::info("sent 11");
-		msg_manager->WriteByte(11);
+		msg_manager->SendRawByte(11);
 		awaiting_substate = 1;
 	}
 	else if (awaiting_substate == 1)
@@ -106,12 +106,12 @@ int Client::UpdateAwaiting()
 	}
 	else if (awaiting_substate == 2) //game full
 	{
-		msg_manager->WriteByte(1);
+		msg_manager->SendRawByte(1);
 		awaiting_substate = 1;
 	}
 	else if (awaiting_substate == 3) //game not found
 	{
-		msg_manager->WriteByte(2);
+		msg_manager->SendRawByte(2);
 		awaiting_substate = 1;
 	}
 	return -1;

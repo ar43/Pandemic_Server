@@ -11,9 +11,8 @@ OutTriggerInfection::~OutTriggerInfection()
 {
 }
 
-void OutTriggerInfection::Send(std::shared_ptr<MsgManager> const& msg_manager)
+void OutTriggerInfection::WriteBody(std::shared_ptr<MsgManager> const& msg_manager)
 {
-	msg_manager->WriteOpcode(GetId());
 	msg_manager->WriteByte(card_id);
 
 	auto length = infection_data.size();
