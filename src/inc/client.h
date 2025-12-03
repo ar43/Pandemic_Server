@@ -6,6 +6,7 @@
 #include <memory>
 #include "randutils.hpp"
 #include "client_state.h"
+#include "join_lobby_response.h"
 
 //class Encryption;
 
@@ -29,12 +30,13 @@ public:
 
 	void ReadInput();
 	void SendOutput();
+
+	void SendLobbyResponse(JoinLobbyResponse response);
 	void AddToLobby(int id);
 
 	const uint8_t GetPid();
 	void SetPid(uint8_t pid);
 
-	int UpdateAwaiting();
 	void Update();
 
 	SOCKET socket;

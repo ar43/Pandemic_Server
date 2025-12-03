@@ -26,4 +26,8 @@ public:
 	bool invalid_opcode;
 
 	int discard_card_id;
+
+	int requested_lobby = -1;
+
+	std::string requested_name;
 };

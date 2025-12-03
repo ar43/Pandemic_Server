@@ -7,6 +7,7 @@
 #include "timer.h"
 
 #include "out_server_message.h"
+#include "out_join_lobby.h"
 #include "player_info.h"
 
 
@@ -20,6 +21,7 @@ Client::Client(SOCKET socket)
 	client_input = std::make_shared<ClientInput>();
 	player_info = std::make_unique<PlayerInfo>();
 	timeout_timer = std::make_unique<Timer>();
+	timeout_timer->Start(TIMEOUT_TIME, false);
 }
 
 Client::~Client()
@@ -57,64 +59,16 @@ void Client::Drop(std::string reason)
 	//closesocket(socket);
 }
 
+void Client::SendLobbyResponse(JoinLobbyResponse response)
+{
+	OutJoinLobby packet_lobby((uint8_t)response);
+	packet_lobby.Send(msg_manager);
+}
+
 void Client::AddToLobby(int id)
 {
 	state = ClientState::CSTATE_LOBBY;
-	msg_manager->SendRawByte(0);
-	timeout_timer->Start(TIMEOUT_TIME,false);
-}
-
-int Client::UpdateAwaiting()
-{
-	if (state != ClientState::CSTATE_AWAITING)
-		return -1;
-	
-	if (awaiting_substate == 0)
-	{
-		spdlog::info("sent 11");
-		msg_manager->SendRawByte(11);
-		awaiting_substate = 1;
-	}
-	else if (awaiting_substate == 1)
-	{
-		if (!msg_manager->PendingInput())
-			return -1;
-
-		if (msg_manager->ReadByte() == 12)
-		{
-			auto lobby_id = (int)msg_manager->ReadByte();
-			auto name_length = msg_manager->ReadByte();
-			if (name_length > Client::MAX_NAME_LEN || name_length < 3)
-			{
-				Drop("invalid name length");
-				return -1;
-			}
-			std::string name = msg_manager->ReadString(name_length);
-			player_info->SetName(name);
-			if (player_info->GetName().length() < 3)
-			{
-				Drop("invalid name");
-				return -1;
-			}
-			if (msg_manager->GetError())
-			{
-				Drop("error during handshake");
-				return -1;
-			}
-			return lobby_id;
-		}
-	}
-	else if (awaiting_substate == 2) //game full
-	{
-		msg_manager->SendRawByte(1);
-		awaiting_substate = 1;
-	}
-	else if (awaiting_substate == 3) //game not found
-	{
-		msg_manager->SendRawByte(2);
-		awaiting_substate = 1;
-	}
-	return -1;
+	SendLobbyResponse(JoinLobbyResponse::LOBBY_OK);
 }
 
 void Client::CheckTimeout()

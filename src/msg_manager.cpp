@@ -31,13 +31,6 @@ void MsgManager::MergeOutput()
 	}
 }
 
-void MsgManager::SendRawByte(uint8_t value)
-{
-	ClearTempOutput();
-	WriteByte(value);
-	MergeOutput();
-}
-
 uint8_t MsgManager::ReadByte()
 {
 	if (!input->empty())

@@ -15,8 +15,6 @@ public:
 	void ClearTempOutput();
 	void MergeOutput();
 
-	void SendRawByte(uint8_t value);
-
 	uint8_t ReadByte();
 	uint8_t ReadOpcode();
 	uint16_t ReadShort();

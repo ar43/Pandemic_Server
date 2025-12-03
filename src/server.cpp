@@ -22,6 +22,7 @@
 #include "game.h"
 #include "utility.h"
 #include "player_info.h"
+#include "client_input.h"
 
 #include "spdlog/spdlog.h"
 #include "nlohmann/json.hpp"
@@ -229,7 +230,8 @@ void Server::UpdateAwaitingClients()
 {
     for (auto it = awaiting_clients.begin(); it != awaiting_clients.end();)
     {
-        int requested_lobby = (*it)->UpdateAwaiting();
+		(*it)->Update();
+		int requested_lobby = (*it)->client_input->requested_lobby;
         if (requested_lobby >= 0)
         {
 			bool flag1 = false;
@@ -242,6 +244,7 @@ void Server::UpdateAwaitingClients()
 					{
 						(*it)->SetPid(game->GeneratePid());
 						(*it)->AddToLobby(game->GetId());
+						(*it)->player_info->SetName((*it)->client_input->requested_name);
 						auto name = (*it)->player_info->GetName();
 						game->players.push_back(std::move(*it));
 						it = awaiting_clients.erase(it);
@@ -250,13 +253,13 @@ void Server::UpdateAwaitingClients()
 					}
 					else
 					{
-						(*it)->awaiting_substate = 2; //Game full
+						(*it)->SendLobbyResponse(JoinLobbyResponse::LOBBY_FULL);
 						flag2 = true;
 					}
 				}
 			}
 			if(!flag2 && !flag1)
-				(*it)->awaiting_substate = 3; //Game does not exist
+				(*it)->SendLobbyResponse(JoinLobbyResponse::LOBBY_NOEXIST);
 			if(!flag1)
 				it++;
 			

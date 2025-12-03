@@ -19,5 +19,7 @@ void ClientInput::Reset()
 	client_message = nullptr;
 	ready = false;
 	discard_card_id = -1;
+	requested_lobby = -1;
+	requested_name = "";
 }
 

@@ -138,6 +138,12 @@
     <ClCompile Include="src\out_trigger_epidemic.cpp">
       <Filter>Source Files\Opcodes\Out</Filter>
     </ClCompile>
+    <ClCompile Include="src\in_join_lobby.cpp">
+      <Filter>Source Files\Opcodes\In</Filter>
+    </ClCompile>
+    <ClCompile Include="src\out_join_lobby.cpp">
+      <Filter>Source Files\Opcodes\Out</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\inc\server.h">
@@ -256,6 +262,15 @@
     </ClInclude>
     <ClInclude Include="src\inc\out_trigger_epidemic.h">
       <Filter>Header Files\Opcodes\Out</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\in_join_lobby.h">
+      <Filter>Header Files\Opcodes\In</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\out_join_lobby.h">
+      <Filter>Header Files\Opcodes\Out</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\join_lobby_response.h">
+      <Filter>Header Files\Enums\Shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
