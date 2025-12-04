@@ -7,7 +7,7 @@
 class MsgManager
 {
 public:
-	MsgManager(std::queue<char> *input,std::queue<char> *output);
+	MsgManager(std::deque<char> *input,std::queue<char> *output);
 	~MsgManager();
 
 	void InitEncryption(uint64_t client_session_key, uint64_t server_session_key);
@@ -23,8 +23,11 @@ public:
 	std::string ReadString(uint16_t length);
 	void ReadDiscard(int num);
 
+	uint16_t PeekPacketSize();
+
 	void WriteByte(uint8_t value);
 	void WriteOpcode(uint8_t op);
+	void WriteSize(int header_size);
 	void WriteNull(int len);
 	void WriteShort(uint16_t num);
 	void WriteInt(uint32_t num);
@@ -38,13 +41,15 @@ public:
 	bool PendingInput();
 	uint8_t BitstreamGetNextByte();
 
+	size_t GetInputSize();
+
 	bool GetError();
 	void SetError();
 private:
 	//std::unique_ptr<Encryption> packetEncryption;
 	//std::unique_ptr<Encryption> packetDecryption;
 	std::queue<char> bit_queue;
-	std::queue<char> *input;
+	std::deque<char> *input;
 	std::queue<char> *outputFinal;
 	std::deque<char> output;
 	

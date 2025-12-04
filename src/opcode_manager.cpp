@@ -28,11 +28,27 @@ bool OpcodeManager::Receive(std::shared_ptr<ClientInput> const& client_input, ui
 {
 	while (msg_manager->PendingInput())
 	{
+		auto startSize = msg_manager->GetInputSize();
+		auto peekPacketSize = msg_manager->PeekPacketSize();
+
+		if (peekPacketSize > startSize)
+		{
+			spdlog::warn("got a partial packet from pid {}, waiting for full packet...", pid);
+			break;
+		}
+
 		auto opcode_id = msg_manager->ReadOpcode();
 		auto opcode = GetOpcode(opcode_id);
+		auto packetSize = msg_manager->ReadShort();
 		opcode->Receive(msg_manager,client_input);
+		auto totalSize = startSize - msg_manager->GetInputSize();
+
+		if (totalSize != packetSize || packetSize != peekPacketSize)
+			spdlog::error("packet size mismatch {} {} {}", totalSize, packetSize, peekPacketSize);
+
 		if(opcode_id != 0)
 			spdlog::info("client({}): opcode {} - pnum: {}", pid, opcode_id, client_input->num_actions);
+
 		if (client_input->invalid_opcode)
 		{
 			spdlog::warn("client opcode {} - invalid opcode", opcode_id);

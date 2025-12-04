@@ -22,5 +22,6 @@ uint8_t OpcodeOut::GetId()
 void OpcodeOut::WriteHeader(std::shared_ptr<MsgManager> const& msg_manager)
 {
 	//reverse order
+	msg_manager->WriteSize(OpcodeOut::HEADER_SIZE);
 	msg_manager->WriteOpcode((uint8_t)id);
 }

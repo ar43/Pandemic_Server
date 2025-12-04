@@ -11,6 +11,8 @@ public:
 	OpcodeOut(ServerOpcode id);
 	~OpcodeOut();
 
+	static constexpr int HEADER_SIZE = 3;
+
 	void Send(std::shared_ptr<MsgManager> const& msg_manager);
 	uint8_t GetId();
 protected:

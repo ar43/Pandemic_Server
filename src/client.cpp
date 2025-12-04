@@ -127,7 +127,7 @@ void Client::ReadInput()
 		{
 			for (int i = 0; i < result; i++)
 			{
-				input.push(recvbuf[i]);
+				input.push_back(recvbuf[i]);
 				total_bytes_received++;
 				if (total_bytes_received > MAX_INPUT_PER_TICK)
 				{

@@ -1,8 +1,9 @@
 #include "msg_manager.h"
+#include "opcode_out.h"
 
 #include "spdlog/spdlog.h"
 
-MsgManager::MsgManager(std::queue<char>* input, std::queue<char>* output)
+MsgManager::MsgManager(std::deque<char>* input, std::queue<char>* output)
 {
 	this->input = input;
 	this->outputFinal = output;
@@ -37,7 +38,7 @@ uint8_t MsgManager::ReadByte()
 	{
 		auto ret = (uint8_t)input->front();
 
-		input->pop();
+		input->pop_front();
 		return ret;
 	}
 	else
@@ -94,7 +95,7 @@ void MsgManager::ReadDiscard(int num)
 	{
 		if (!input->empty())
 		{
-			input->pop();
+			input->pop_front();
 		}
 	}
 }
@@ -107,6 +108,13 @@ void MsgManager::WriteByte(uint8_t value)
 void MsgManager::WriteOpcode(uint8_t op)
 {
 	output.push_front(op);
+}
+
+void MsgManager::WriteSize(int headerSize)
+{
+	int num = output.size() + headerSize;
+	output.push_front(num & 0xFF);
+	output.push_front((uint8_t)((num >> 8) & 0xFF));
 }
 
 void MsgManager::WriteNull(int len)
@@ -187,7 +195,7 @@ void MsgManager::WriteBitstream(uint16_t offset)
 
 bool MsgManager::PendingInput()
 {
-	return !input->empty();
+	return GetInputSize() >= OpcodeOut::HEADER_SIZE;
 }
 
 uint8_t MsgManager::BitstreamGetNextByte()
@@ -204,6 +212,19 @@ uint8_t MsgManager::BitstreamGetNextByte()
 		value |= (next_bit << (7-i));
 	}
 	return value;
+}
+
+size_t MsgManager::GetInputSize()
+{
+	return input->size();
+}
+
+uint16_t MsgManager::PeekPacketSize()
+{
+	uint16_t a = (uint16_t)(*input)[1];
+	uint16_t b = (uint16_t)(*input)[2];
+
+	return (a << 8) + b;
 }
 
 bool MsgManager::GetError()

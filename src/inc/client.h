@@ -51,10 +51,10 @@ private:
 	static const uint8_t MAX_NAME_LEN = 29;
 	const double TIMEOUT_TIME = 10000.0;
 	uint64_t ticks = 0;
-	uint8_t pid;
+	uint8_t pid = 255;
 	randutils::mt19937_rng rng;
 
-	std::queue<char> input;
+	std::deque<char> input;
 	std::queue<char> output;
 
 	static void PrintSocketError();
