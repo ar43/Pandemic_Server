@@ -237,13 +237,16 @@ void Game::ProcessEndTurn()
 				AddInfectionRate();
 				DrawInfectionCard(3, true);
 				infection_card_discard_pile->Shuffle();
+				infection_card_discard_pile->PrintDebug();
 				infection_card_deck->Combine(infection_card_discard_pile, true);
 				infection_card_discard_pile = std::make_unique<CardStack>(0);
 				epidemic_timer[1]->Start(EPIDEMIC_DELAY, false);
+				spdlog::info("{} STATE_FIRST_EPIDEMIC 1", player->GetPid());
 			}
 			else if (epidemic_timer[1]->Tick())
 			{
 				end_turn_state = EndTurnState::STATE_DRAW_SECOND_CARD;
+				spdlog::info("{} STATE_FIRST_EPIDEMIC 2", player->GetPid());
 			}
 			break;
 		}
@@ -254,13 +257,16 @@ void Game::ProcessEndTurn()
 				AddInfectionRate();
 				DrawInfectionCard(3, true);
 				infection_card_discard_pile->Shuffle();
+				infection_card_discard_pile->PrintDebug();
 				infection_card_deck->Combine(infection_card_discard_pile, true);
 				infection_card_discard_pile = std::make_unique<CardStack>(0);
 				epidemic_timer[1]->Start(EPIDEMIC_DELAY, false);
+				spdlog::info("{} STATE_SECOND_EPIDEMIC 1", player->GetPid());
 			}
 			else if (epidemic_timer[1]->Tick())
 			{
 				end_turn_state = EndTurnState::STATE_DO_INFECTIONS;
+				spdlog::info("{} STATE_SECOND_EPIDEMIC 2", player->GetPid());
 			}
 			break;
 		}
@@ -585,10 +591,12 @@ void Game::InfectCity(int city_id, uint8_t card_id, InfectionType type, uint8_t 
 	for (int i = 0; i < new_infection_count; i++)
 	{
 		infection_data.push_back(std::make_pair((uint8_t)type, (uint8_t)city_id));
+		spdlog::info("Infected id {}", (uint8_t)city_id);
 	}
 	if (explosion)
 	{
 		infection_data.push_back(std::make_pair((uint8_t)InfectionType::EXPLOSION, (uint8_t)city_id));
+		spdlog::info("Exploded at id {}", (uint8_t)city_id);
 		auto neighbours = current_map->GetNeighbours(city_id);
 		for (auto cid : neighbours)
 		{

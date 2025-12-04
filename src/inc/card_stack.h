@@ -18,6 +18,8 @@ public:
 	void Split(std::unique_ptr<CardStack> &bottom, std::unique_ptr<CardStack> &top);
 	void Combine(std::unique_ptr<CardStack>& other, bool put_on_top);
 
+	void PrintDebug();
+
 	uint8_t *GetPointer();
 
 private:

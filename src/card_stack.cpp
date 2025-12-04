@@ -113,6 +113,15 @@ void CardStack::Combine(std::unique_ptr<CardStack>& other, bool put_on_top)
 	}
 }
 
+void CardStack::PrintDebug()
+{
+	spdlog::info("Following cards are in the deck: ");
+	for (const auto& item : stack)
+	{
+		spdlog::info("{}", item);
+	}
+}
+
 uint8_t* CardStack::GetPointer()
 {
 	return stack.data();

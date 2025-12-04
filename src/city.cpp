@@ -31,18 +31,10 @@ std::pair<int, bool> City::AddInfection(InfectionType type, uint8_t count)
 		spdlog::error("City::AddInfection: type out of bounds");
 		return std::make_pair(0, false);
 	}
-
-	if (infections[index] == 3)
+	if (count > 3)
 	{
-		if (can_explode)
-		{
-			can_explode = false;
-			return std::make_pair(0, true);
-		}
-		else
-		{
-			return std::make_pair(0, false);
-		}
+		spdlog::error("AddInfection count > 3");
+		return std::make_pair(0, false);
 	}
 
 	uint8_t old_infections = infections[index];
@@ -50,6 +42,15 @@ std::pair<int, bool> City::AddInfection(InfectionType type, uint8_t count)
 	if (infections[index] > 3)
 	{
 		infections[index] = 3;
+		if (can_explode)
+		{
+			can_explode = false;
+			return std::make_pair(infections[index] - old_infections, true);
+		}
+		else
+		{
+			return std::make_pair(infections[index] - old_infections, false);
+		}
 	}
 
 	return std::make_pair(infections[index]-old_infections, false);
