@@ -66,6 +66,32 @@ int Map::FindCityId(std::string name)
 	return 0;
 }
 
+bool Map::TreatDisease(int city_id, InfectionType type)
+{
+	if (cities.find(city_id) != cities.end())
+	{
+		return cities[city_id].get()->TreatDisease(type);
+	}
+	else
+	{
+		spdlog::error("GetInfectionCountFromCity could not find city");
+		return false;
+	}
+}
+
+int Map::GetInfectionCountFromCity(int city_id, InfectionType type)
+{
+	if (cities.find(city_id) != cities.end())
+	{
+		return cities[city_id].get()->GetInfectionCount(type);
+	}
+	else
+	{
+		spdlog::error("GetInfectionCountFromCity could not find city");
+		return 0;
+	}
+}
+
 void Map::ResetExplosions()
 {
 	for (auto& it: cities) 

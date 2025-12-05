@@ -153,6 +153,7 @@
     <ClCompile Include="src\in_join_lobby.cpp" />
     <ClCompile Include="src\in_move.cpp" />
     <ClCompile Include="src\in_ready.cpp" />
+    <ClCompile Include="src\in_treat_disease.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\map.cpp" />
     <ClCompile Include="src\msg_manager.cpp" />
@@ -162,6 +163,7 @@
     <ClCompile Include="src\out_begin_game.cpp" />
     <ClCompile Include="src\out_join_lobby.cpp" />
     <ClCompile Include="src\out_server_message.cpp" />
+    <ClCompile Include="src\out_treat_disease.cpp" />
     <ClCompile Include="src\out_trigger_epidemic.cpp" />
     <ClCompile Include="src\out_trigger_infection.cpp" />
     <ClCompile Include="src\out_update_players.cpp" />
@@ -192,6 +194,7 @@
     <ClInclude Include="src\inc\in_join_lobby.h" />
     <ClInclude Include="src\inc\in_move.h" />
     <ClInclude Include="src\inc\in_ready.h" />
+    <ClInclude Include="src\inc\in_treat_disease.h" />
     <ClInclude Include="src\inc\join_lobby_response.h" />
     <ClInclude Include="src\inc\map.h" />
     <ClInclude Include="src\inc\msg_manager.h" />
@@ -201,6 +204,7 @@
     <ClInclude Include="src\inc\out_begin_game.h" />
     <ClInclude Include="src\inc\out_join_lobby.h" />
     <ClInclude Include="src\inc\out_server_message.h" />
+    <ClInclude Include="src\inc\out_treat_disease.h" />
     <ClInclude Include="src\inc\out_trigger_epidemic.h" />
     <ClInclude Include="src\inc\out_trigger_infection.h" />
     <ClInclude Include="src\inc\out_update_players.h" />

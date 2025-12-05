@@ -20,6 +20,8 @@ public:
 	CityColor GetColor();
 	PlayerCard GetPlayerCard();
 	InfectionCard GetInfectionCard();
+	int GetInfectionCount(InfectionType type);
+	bool TreatDisease(InfectionType type);
 	int GetId();
 	std::string GetName();
 private:

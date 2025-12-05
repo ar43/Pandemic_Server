@@ -18,6 +18,7 @@
 #include "infection_card.h"
 #include "out_trigger_infection.h"
 #include "out_trigger_epidemic.h"
+#include "out_treat_disease.h"
 
 #include <iostream>
 #include <array>
@@ -633,6 +634,24 @@ void Game::ProcessInput()
 				Broadcast(update_turn);
 			}
 			client_input->requested_move = false;
+		}
+		else if (client_input->treat_disease >= (int)InfectionType::VIRUS_BLUE && client_input->treat_disease <= (int)InfectionType::VIRUS_BLACK)
+		{
+			if (player->player_info->GetActions() > 0)
+			{
+				if (current_map->GetInfectionCountFromCity(player->player_info->GetPosition(), (InfectionType)client_input->treat_disease) > 0)
+				{
+					bool success = current_map->TreatDisease(player->player_info->GetPosition(), (InfectionType)client_input->treat_disease);
+					if (!success)
+						spdlog::error("Unexpected fail on treat disease");
+					player->player_info->SetActions(player->player_info->GetActions() - 1);
+					OutUpdateTurn update_turn(TurnUpdateType::UPDATE_ACTIONS, player->GetPid(), player->player_info->GetActions());
+					Broadcast(update_turn);
+					OutTreatDisease out_treat_disease(player->GetPid(), client_input->treat_disease, current_map->GetInfectionCountFromCity(player->player_info->GetPosition(), (InfectionType)client_input->treat_disease));
+					Broadcast(out_treat_disease);
+				}
+			}
+			client_input->treat_disease = -1;
 		}
 	}
 }

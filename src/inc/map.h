@@ -21,6 +21,8 @@ public:
 	std::vector<int> GetNeighbours(int id);
 	InfectionType GetInfectionTypeFromCity(int id);
 	int FindCityId(std::string name);
+	bool TreatDisease(int city_id, InfectionType type);
+	int GetInfectionCountFromCity(int city_id, InfectionType type);
 private:
 	std::unordered_map<int, std::unique_ptr<City>> cities;
 };

@@ -23,6 +23,29 @@ City::~City()
 {
 }
 
+int City::GetInfectionCount(InfectionType type)
+{
+	if ((int)type > NUM_INFECTIONS)
+	{
+		spdlog::error("GetInfectionCount overflow");
+		return 0;
+	}
+	return this->infections[(int)type];
+}
+
+bool City::TreatDisease(InfectionType type)
+{
+	if (GetInfectionCount(type) > 0)
+	{
+		this->infections[(int)type]--;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 std::pair<int, bool> City::AddInfection(InfectionType type, uint8_t count)
 {
 	size_t index = (size_t)type;

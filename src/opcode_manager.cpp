@@ -10,6 +10,7 @@
 #include "in_ready.h"
 #include "in_client_message.h"
 #include "in_join_lobby.h"
+#include "in_treat_disease.h"
 #include <in_discard.h>
 
 OpcodeManager::OpcodeManager(std::shared_ptr<MsgManager> msg_manager)
@@ -80,6 +81,7 @@ std::unique_ptr<OpcodeIn> OpcodeManager::GetOpcode(uint8_t id)
 		case ClientOpcode::READY: return std::make_unique<InReady>();
 		case ClientOpcode::DISCARD: return std::make_unique<InDiscard>();
 		case ClientOpcode::JOIN_LOBBY: return std::make_unique<InJoinLobby>();
+		case ClientOpcode::TREAT_DISEASE: return std::make_unique<InTreatDisease>();
 		default: return std::make_unique<InError>();
 
 	}

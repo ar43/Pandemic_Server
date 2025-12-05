@@ -16,6 +16,7 @@ struct ClientInput
 
 public:
 	bool requested_move = false;
+	int treat_disease = -1;
 	bool ready = false;
 	uint8_t target_city = 0;
 

@@ -21,5 +21,6 @@ void ClientInput::Reset()
 	discard_card_id = -1;
 	requested_lobby = -1;
 	requested_name = "";
+	treat_disease = -1;
 }
 
