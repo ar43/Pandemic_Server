@@ -32,6 +32,12 @@ private:
 	void CreateQueuedGames();
 	void QueueInitialGames();
 
+	void UdpPingListener(uint16_t udp_port, const std::string& magic_ping = "PING", const std::string& magic_pong = "PONG");
+
+	std::thread SpawnUdp() {
+		return std::thread([this] { this->UdpPingListener(DEFAULT_PORT + 1); });
+	}
+
 	int GenerateGameId();
 
 	bool running;

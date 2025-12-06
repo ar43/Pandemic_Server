@@ -122,6 +122,8 @@ void Server::Run()
 	using namespace std::chrono;
     running = true;
 
+	std::thread udp = SpawnUdp();
+
     while (running)
     {
 		high_resolution_clock::time_point t1 = high_resolution_clock::now();
@@ -136,6 +138,8 @@ void Server::Run()
 		spdlog::info("tick took: {} ms", time_span2.count());
 		*/
     }
+
+	udp.join();
 }
 
 void Server::Tick()
@@ -312,4 +316,65 @@ void Server::QueueInitialGames()
 	game_creation_queue.push(std::move(game1));
 	game_creation_queue.push(std::move(game2));
 	game_creation_queue.push(std::move(game3));
+}
+
+void Server::UdpPingListener(uint16_t udp_port, const std::string& magic_ping, const std::string& magic_pong)
+{
+	int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	if (sockfd < 0) {
+		perror("UDP socket creation failed");
+		return;
+	}
+
+	// Allow port reuse (useful during development)
+	int opt = 1;
+	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char*>(&opt), sizeof(opt));
+
+	struct sockaddr_in server_addr {};
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.s_addr = INADDR_ANY;
+	server_addr.sin_port = htons(udp_port);
+
+	if (bind(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+		perror("UDP bind failed");
+		_close(sockfd);
+		return;
+	}
+
+	spdlog::info("UDP ping listener started on port {}", udp_port);
+
+	char buffer[1024];
+	char client_ip_str[INET_ADDRSTRLEN];  // Exactly the right size for IPv4
+	struct sockaddr_in client_addr {};
+	socklen_t addr_len = sizeof(client_addr);
+
+	while (running) {
+		util::SleepFor(0.01);
+		int recv_len = recvfrom(sockfd, buffer, sizeof(buffer) - 1, 0,
+			(struct sockaddr*)&client_addr, &addr_len);
+
+		if (recv_len <= 0) {
+			if (running) continue;
+			break;
+		}
+
+		buffer[recv_len] = '\0';
+		std::string message(buffer);
+
+		// Optional: trim whitespace/newlines
+		message.erase(message.find_last_not_of(" \n\r\t") + 1);
+
+		if (inet_ntop(AF_INET, &client_addr.sin_addr, client_ip_str, sizeof(client_ip_str)) == nullptr) {
+			strcpy_s(client_ip_str, "unknown");
+		}
+
+		if (message == magic_ping) {
+			sendto(sockfd, magic_pong.c_str(), magic_pong.length(), 0,
+				(struct sockaddr*)&client_addr, addr_len);
+			spdlog::debug("UDP ping from {} {}", client_ip_str, ntohs(client_addr.sin_port));
+		}
+	}
+
+	_close(sockfd);
+	spdlog::info("UDP listener stopped.");
 }
