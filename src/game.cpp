@@ -153,7 +153,7 @@ void Game::ProcessEndTurn()
 			if (card == (uint8_t)PlayerCard::EPIDEMIC)
 			{
 				epidemic_timer[0]->Start(EPIDEMIC_DELAY, false);
-				OutTriggerEpidemic out_trigger_epidemic(0);
+				OutTriggerEpidemic out_trigger_epidemic(player->GetPid());
 				Broadcast(out_trigger_epidemic);
 				end_turn_state = EndTurnState::STATE_FIRST_EPIDEMIC;
 			}
@@ -215,7 +215,7 @@ void Game::ProcessEndTurn()
 			if (card == (uint8_t)PlayerCard::EPIDEMIC)
 			{
 				epidemic_timer[0]->Start(EPIDEMIC_DELAY, false);
-				OutTriggerEpidemic out_trigger_epidemic(0);
+				OutTriggerEpidemic out_trigger_epidemic(player->GetPid());
 				Broadcast(out_trigger_epidemic);
 				end_turn_state = EndTurnState::STATE_SECOND_EPIDEMIC;
 			}
@@ -647,7 +647,10 @@ void Game::ProcessInput()
 					player->player_info->SetActions(player->player_info->GetActions() - 1);
 					OutUpdateTurn update_turn(TurnUpdateType::UPDATE_ACTIONS, player->GetPid(), player->player_info->GetActions());
 					Broadcast(update_turn);
-					OutTreatDisease out_treat_disease(player->GetPid(), client_input->treat_disease, current_map->GetInfectionCountFromCity(player->player_info->GetPosition(), (InfectionType)client_input->treat_disease));
+					OutTreatDisease out_treat_disease(player->GetPid(), 
+						client_input->treat_disease, 
+						current_map->GetInfectionCountFromCity(player->player_info->GetPosition(), 
+						(InfectionType)client_input->treat_disease), player->player_info->GetPosition());
 					Broadcast(out_treat_disease);
 				}
 			}

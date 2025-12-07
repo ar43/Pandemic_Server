@@ -5,11 +5,11 @@
 class OutTriggerEpidemic : public OpcodeOut
 {
 public:
-	OutTriggerEpidemic(int temp);
+	OutTriggerEpidemic(uint8_t pid);
 	~OutTriggerEpidemic();
 
 protected:
 	void WriteBody(std::shared_ptr<MsgManager> const& msg_manager);
 private:
-	int temp;
+	uint8_t pid;
 };

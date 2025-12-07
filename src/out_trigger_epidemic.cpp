@@ -2,9 +2,9 @@
 #include "msg_manager.h"
 #include "spdlog/spdlog.h"
 
-OutTriggerEpidemic::OutTriggerEpidemic(int temp) : OpcodeOut(ServerOpcode::TRIGGER_EPIDEMIC)
+OutTriggerEpidemic::OutTriggerEpidemic(uint8_t pid) : OpcodeOut(ServerOpcode::TRIGGER_EPIDEMIC)
 {
-	this->temp = temp;
+	this->pid = pid;
 }
 
 OutTriggerEpidemic::~OutTriggerEpidemic()
@@ -13,4 +13,5 @@ OutTriggerEpidemic::~OutTriggerEpidemic()
 
 void OutTriggerEpidemic::WriteBody(std::shared_ptr<MsgManager> const& msg_manager)
 {
+	msg_manager->WriteByte(pid);
 }
