@@ -19,6 +19,7 @@
 #include "out_trigger_infection.h"
 #include "out_trigger_epidemic.h"
 #include "out_treat_disease.h"
+#include "out_update_research.h"
 
 #include <iostream>
 #include <array>
@@ -690,36 +691,88 @@ void Game::HandleMovement(std::unique_ptr<Client>& player)
 	client_input->requested_move = MovementType::MOVE_NONE;
 }
 
+bool Game::ValidateInput(std::unique_ptr<Client>& player)
+{
+	auto& client_input = player->client_input;
+
+	if (client_input->requested_move != MovementType::MOVE_NONE && 
+	   (!current_map->IsPositionValid(client_input->target_city) || client_input->target_city == player->player_info->GetPosition()))
+	{
+		spdlog::warn("pid {} sent an invalid input (movement)");
+		return false;
+	}
+		
+	return true;
+}
+
+void Game::HandleTreatDisease(std::unique_ptr<Client>& player)
+{
+	auto& client_input = player->client_input;
+	if (client_input->treat_disease >= (int)InfectionType::VIRUS_BLUE && client_input->treat_disease <= (int)InfectionType::VIRUS_BLACK)
+	{
+		if (player->player_info->GetActions() > 0)
+		{
+			if (current_map->GetInfectionCountFromCity(player->player_info->GetPosition(), (InfectionType)client_input->treat_disease) > 0)
+			{
+				bool success = current_map->TreatDisease(player->player_info->GetPosition(), (InfectionType)client_input->treat_disease);
+				if (!success)
+					spdlog::error("Unexpected fail on treat disease");
+				player->player_info->SetActions(player->player_info->GetActions() - 1);
+				OutUpdateTurn update_turn(TurnUpdateType::UPDATE_ACTIONS, player->GetPid(), player->player_info->GetActions());
+				Broadcast(update_turn);
+				OutTreatDisease out_treat_disease(player->GetPid(),
+					client_input->treat_disease,
+					current_map->GetInfectionCountFromCity(player->player_info->GetPosition(),
+					(InfectionType)client_input->treat_disease), player->player_info->GetPosition());
+				Broadcast(out_treat_disease);
+			}
+		}
+		client_input->treat_disease = -1;
+	}
+}
+
+void Game::HandleResearchStation(std::unique_ptr<Client>& player)
+{
+	auto& client_input = player->client_input;
+	auto pos = player->player_info->GetPosition();
+	uint8_t card = (uint8_t)current_map->GetPlayerCardFromCityId(player->player_info->GetPosition());
+	auto valid_pos = !current_map->ValidateResearchStations(pos, pos);
+	if (client_input->place_research_station && valid_pos && player->player_info->GetActions() > 0 && player->player_info->hand->HasCard((uint8_t)card))
+	{
+		if (current_map->PlaceResearchStation(pos))
+		{
+			player->player_info->SetActions(player->player_info->GetActions() - 1);
+			OutUpdateTurn update_turn(TurnUpdateType::UPDATE_ACTIONS, player->GetPid(), player->player_info->GetActions());
+			Broadcast(update_turn);
+
+			auto stations = current_map->GetResearchStations();
+			OutUpdateResearch update_research(cures, (uint8_t)stations.size(), stations.data());
+			Broadcast(update_research);
+
+			player->player_info->hand->RemoveCard((uint8_t)card);
+			OutUpdatePlayerCard update_card(player->GetPid(), true, 1, &card);
+			Broadcast(update_card);
+		}
+		else
+		{
+			spdlog::error("Error while placing research station");
+		}
+	}
+}
+
 void Game::ProcessInput()
 {
 	for (auto& player : players)
 	{
 		auto &client_input = player->client_input;
-		if (client_input->requested_move != MovementType::MOVE_NONE)
-		{
-			HandleMovement(player);
-		}
-		else if (client_input->treat_disease >= (int)InfectionType::VIRUS_BLUE && client_input->treat_disease <= (int)InfectionType::VIRUS_BLACK)
-		{
-			if (player->player_info->GetActions() > 0)
-			{
-				if (current_map->GetInfectionCountFromCity(player->player_info->GetPosition(), (InfectionType)client_input->treat_disease) > 0)
-				{
-					bool success = current_map->TreatDisease(player->player_info->GetPosition(), (InfectionType)client_input->treat_disease);
-					if (!success)
-						spdlog::error("Unexpected fail on treat disease");
-					player->player_info->SetActions(player->player_info->GetActions() - 1);
-					OutUpdateTurn update_turn(TurnUpdateType::UPDATE_ACTIONS, player->GetPid(), player->player_info->GetActions());
-					Broadcast(update_turn);
-					OutTreatDisease out_treat_disease(player->GetPid(), 
-						client_input->treat_disease, 
-						current_map->GetInfectionCountFromCity(player->player_info->GetPosition(), 
-						(InfectionType)client_input->treat_disease), player->player_info->GetPosition());
-					Broadcast(out_treat_disease);
-				}
-			}
-			client_input->treat_disease = -1;
-		}
+
+		if (!ValidateInput(player))
+			continue;
+
+		HandleMovement(player);
+		HandleTreatDisease(player);
+		
+		
 	}
 }
 

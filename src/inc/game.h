@@ -42,6 +42,9 @@ private:
 	void PreparePlayerCardDeck();
 	void ProcessInput();
 	void HandleMovement(std::unique_ptr<Client>& player);
+    bool ValidateInput(std::unique_ptr<Client>& player);
+	void HandleTreatDisease(std::unique_ptr<Client>& player);
+	void HandleResearchStation(std::unique_ptr<Client>& player);
 	void Broadcast(OpcodeOut& opcode);
 	void GenerateRoles();
 	void PlayersLose();
@@ -75,6 +78,7 @@ private:
 	uint64_t ticks = 0;
 	uint32_t turn_counter = 0;
 	uint8_t infection_rate = 0;
+	uint8_t cures = 0;
 	uint8_t id;
 	uint8_t max_players;
 	int active_player = -1;

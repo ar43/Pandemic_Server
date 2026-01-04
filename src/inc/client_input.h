@@ -19,6 +19,8 @@ public:
 	MovementType requested_move = MovementType::MOVE_NONE;
 	int treat_disease = -1;
 	bool ready = false;
+	bool create_cure = false;
+	bool place_research_station = false;
 	uint8_t target_city = 0;
 
 	std::unique_ptr<std::pair<ClientMessageType, std::string>> client_message;

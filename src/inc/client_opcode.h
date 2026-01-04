@@ -8,5 +8,6 @@ enum class ClientOpcode
 	READY,
 	DISCARD,
 	JOIN_LOBBY,
-	TREAT_DISEASE
+	TREAT_DISEASE,
+	RESEARCH
 };

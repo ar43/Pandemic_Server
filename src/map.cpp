@@ -38,6 +38,19 @@ Map::~Map()
 {
 }
 
+std::vector<uint8_t> Map::GetResearchStations()
+{
+	std::vector<uint8_t> list = {};
+	for (auto& city : cities)
+	{
+		if (city.second->HasResearchStation())
+		{
+			list.push_back(city.first);
+		}
+	}
+	return list;
+}
+
 int Map::InfectionCardToCityId(InfectionCard infection_card)
 {
 	if (infection_card >= InfectionCard::NUM_INFECTION_CARDS)
@@ -113,6 +126,18 @@ PlayerCard Map::GetPlayerCardFromCityId(int city_id)
 	}
 }
 
+bool Map::IsPositionValid(int city_id)
+{
+	if (cities.find(city_id) != cities.end())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 bool Map::IsCityNeighbour(int first_id, int second_id)
 {
 	if (cities.find(first_id) != cities.end() && cities.find(second_id) != cities.end())
@@ -125,6 +150,16 @@ bool Map::IsCityNeighbour(int first_id, int second_id)
 				return true;
 			}
 		}
+	}
+	return false;
+}
+
+bool Map::PlaceResearchStation(int city_id)
+{
+	if (IsPositionValid(city_id))
+	{
+		cities[city_id].get()->PlaceResearchStation();
+		return true;
 	}
 	return false;
 }

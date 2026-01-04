@@ -15,10 +15,14 @@ public:
 	Map(std::string map_name);
 	~Map();
 
+	std::vector<uint8_t> GetResearchStations();
+
 	int InfectionCardToCityId(InfectionCard infection_card);
 	void ResetExplosions();
 	PlayerCard GetPlayerCardFromCityId(int city_id);
+    bool IsPositionValid(int city_id);
 	bool IsCityNeighbour(int first_id, int second_id);
+	bool PlaceResearchStation(int city_id);
 	bool ValidateResearchStations(int first_id, int second_id);
 	std::pair<int, bool> AddInfection(int id, InfectionType type, uint8_t count);
 	std::vector<int> GetNeighbours(int id);
