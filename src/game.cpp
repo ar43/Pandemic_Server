@@ -617,23 +617,87 @@ Client* Game::GetPlayerById(uint8_t id)
 	return nullptr;
 }
 
-void Game::ProcessInput()
+void Game::HandleMovement(std::unique_ptr<Client>& player)
 {
-	for (auto& player : players)
+	auto& client_input = player->client_input;
+	switch (client_input->requested_move)
 	{
-		auto &client_input = player->client_input;
-		if (client_input->requested_move)
+		case MovementType::MOVE_NORMAL:
 		{
 			if (current_map->IsCityNeighbour(player->player_info->GetPosition(), client_input->target_city) && player->player_info->GetActions() > 0)
 			{
-				spdlog::info("a player requested to move");
+				spdlog::info("a player requested to move (type: {})", (int)client_input->requested_move);
 				broadcast_positions = true;
 				player->player_info->SetPosition(client_input->target_city);
 				player->player_info->SetActions(player->player_info->GetActions() - 1);
 				OutUpdateTurn update_turn(TurnUpdateType::UPDATE_ACTIONS, player->GetPid(), player->player_info->GetActions());
 				Broadcast(update_turn);
 			}
-			client_input->requested_move = false;
+			break;
+		}
+		case MovementType::MOVE_CARD_ANYWHERE:
+		{
+			uint8_t card = (uint8_t)current_map->GetPlayerCardFromCityId(player->player_info->GetPosition());
+
+			if (player->player_info->hand->HasCard((uint8_t)card) && player->player_info->GetActions() > 0)
+			{
+				spdlog::info("a player requested to move (type: {})", (int)client_input->requested_move);
+				broadcast_positions = true;
+				player->player_info->SetPosition(client_input->target_city);
+				player->player_info->SetActions(player->player_info->GetActions() - 1);
+				player->player_info->hand->RemoveCard((uint8_t)card);
+				OutUpdatePlayerCard update_card(player->GetPid(), true, 1, &card);
+				Broadcast(update_card);
+				OutUpdateTurn update_turn(TurnUpdateType::UPDATE_ACTIONS, player->GetPid(), player->player_info->GetActions());
+				Broadcast(update_turn);
+			}
+			break;
+		}
+		case MovementType::MOVE_CARD_SPECIFIC:
+		{
+			uint8_t card = (uint8_t)current_map->GetPlayerCardFromCityId(client_input->target_city);
+
+			if (player->player_info->hand->HasCard((uint8_t)card) && player->player_info->GetActions() > 0)
+			{
+				spdlog::info("a player requested to move (type: {})", (int)client_input->requested_move);
+				broadcast_positions = true;
+				player->player_info->SetPosition(client_input->target_city);
+				player->player_info->SetActions(player->player_info->GetActions() - 1);
+				player->player_info->hand->RemoveCard((uint8_t)card);
+				OutUpdatePlayerCard update_card(player->GetPid(), true, 1, &card);
+				Broadcast(update_card);
+				OutUpdateTurn update_turn(TurnUpdateType::UPDATE_ACTIONS, player->GetPid(), player->player_info->GetActions());
+				Broadcast(update_turn);
+			}
+			break;
+		}
+		case MovementType::MOVE_RESEARCH_STATION:
+		{
+			bool valid_research_stations = current_map->ValidateResearchStations(client_input->target_city, player->player_info->GetPosition());
+
+			if (valid_research_stations && player->player_info->GetActions() > 0)
+			{
+				spdlog::info("a player requested to move (type: {})", (int)client_input->requested_move);
+				broadcast_positions = true;
+				player->player_info->SetPosition(client_input->target_city);
+				player->player_info->SetActions(player->player_info->GetActions() - 1);
+				OutUpdateTurn update_turn(TurnUpdateType::UPDATE_ACTIONS, player->GetPid(), player->player_info->GetActions());
+				Broadcast(update_turn);
+			}
+			break;
+		}
+	}
+	client_input->requested_move = MovementType::MOVE_NONE;
+}
+
+void Game::ProcessInput()
+{
+	for (auto& player : players)
+	{
+		auto &client_input = player->client_input;
+		if (client_input->requested_move != MovementType::MOVE_NONE)
+		{
+			HandleMovement(player);
 		}
 		else if (client_input->treat_disease >= (int)InfectionType::VIRUS_BLUE && client_input->treat_disease <= (int)InfectionType::VIRUS_BLACK)
 		{

@@ -17,6 +17,7 @@ City::City(int id, std::string name, std::vector<int>& neighbour_ids, CityColor 
 	this->player_card = player_card;
 	this->infection_card = infection_card;
 	this->city_color = city_color;
+	this->research_station = false;
 }
 
 City::~City()
@@ -25,12 +26,12 @@ City::~City()
 
 int City::GetInfectionCount(InfectionType type)
 {
-	if ((int)type > NUM_INFECTIONS)
+	if ((size_t)type >= sizeof(this->infections))
 	{
 		spdlog::error("GetInfectionCount overflow");
 		return 0;
 	}
-	return this->infections[(int)type];
+	return this->infections[(size_t)type];
 }
 
 bool City::TreatDisease(InfectionType type)
@@ -92,6 +93,16 @@ CityColor City::GetColor()
 PlayerCard City::GetPlayerCard()
 {
 	return player_card;
+}
+
+bool City::HasResearchStation()
+{
+	return research_station;
+}
+
+void City::PlaceResearchStation()
+{
+	research_station = true;
 }
 
 InfectionCard City::GetInfectionCard()

@@ -100,6 +100,19 @@ void Map::ResetExplosions()
 	}
 }
 
+PlayerCard Map::GetPlayerCardFromCityId(int city_id)
+{
+	if (cities.find(city_id) != cities.end())
+	{
+		return cities[city_id].get()->GetPlayerCard();
+	}
+	else
+	{
+		spdlog::error("GetInfectionCountFromCity could not find city");
+		return PlayerCard::NUM_PLAYER_CARDS;
+	}
+}
+
 bool Map::IsCityNeighbour(int first_id, int second_id)
 {
 	if (cities.find(first_id) != cities.end() && cities.find(second_id) != cities.end())
@@ -112,6 +125,17 @@ bool Map::IsCityNeighbour(int first_id, int second_id)
 				return true;
 			}
 		}
+	}
+	return false;
+}
+
+bool Map::ValidateResearchStations(int first_id, int second_id)
+{
+	if (cities.find(first_id) != cities.end() && cities.find(second_id) != cities.end())
+	{
+		auto first_research = cities[first_id]->HasResearchStation();
+		auto second_research = cities[second_id]->HasResearchStation();
+		return first_research && second_research;
 	}
 	return false;
 }

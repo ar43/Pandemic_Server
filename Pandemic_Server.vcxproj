@@ -197,6 +197,7 @@
     <ClInclude Include="src\inc\in_treat_disease.h" />
     <ClInclude Include="src\inc\join_lobby_response.h" />
     <ClInclude Include="src\inc\map.h" />
+    <ClInclude Include="src\inc\movement_type.h" />
     <ClInclude Include="src\inc\msg_manager.h" />
     <ClInclude Include="src\inc\opcode_in.h" />
     <ClInclude Include="src\inc\opcode_manager.h" />

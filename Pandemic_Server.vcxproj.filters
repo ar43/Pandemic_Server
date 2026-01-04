@@ -284,5 +284,8 @@
     <ClInclude Include="src\inc\out_treat_disease.h">
       <Filter>Header Files\Opcodes\Out</Filter>
     </ClInclude>
+    <ClInclude Include="src\inc\movement_type.h">
+      <Filter>Header Files\Enums\Shared</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -14,7 +14,7 @@ void ClientInput::Reset()
 {
 	num_actions = 0;
 	invalid_opcode = false;
-	requested_move = false;
+	requested_move = MovementType::MOVE_NONE;
 	target_city = 0;
 	client_message = nullptr;
 	ready = false;

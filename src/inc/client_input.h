@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "client_message_type.h"
+#include "movement_type.h"
 
 struct Position;
 
@@ -15,7 +16,7 @@ struct ClientInput
 	void Reset();
 
 public:
-	bool requested_move = false;
+	MovementType requested_move = MovementType::MOVE_NONE;
 	int treat_disease = -1;
 	bool ready = false;
 	uint8_t target_city = 0;

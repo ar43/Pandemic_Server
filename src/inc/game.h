@@ -41,6 +41,7 @@ private:
 	void UpdateGameState();
 	void PreparePlayerCardDeck();
 	void ProcessInput();
+	void HandleMovement(std::unique_ptr<Client>& player);
 	void Broadcast(OpcodeOut& opcode);
 	void GenerateRoles();
 	void PlayersLose();

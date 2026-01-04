@@ -19,6 +19,8 @@ public:
 	void ResetExplosion();
 	CityColor GetColor();
 	PlayerCard GetPlayerCard();
+	bool HasResearchStation();
+	void PlaceResearchStation();
 	InfectionCard GetInfectionCard();
 	int GetInfectionCount(InfectionType type);
 	bool TreatDisease(InfectionType type);
@@ -33,4 +35,6 @@ private:
 
 	bool can_explode;
 	uint8_t infections[NUM_INFECTIONS];
+
+	bool research_station;
 };
