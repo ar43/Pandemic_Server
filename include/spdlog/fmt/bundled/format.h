@@ -40,6 +40,7 @@
 #include <memory>        // std::uninitialized_copy
 #include <stdexcept>     // std::runtime_error
 #include <system_error>  // std::system_error
+#include <iterator>
 
 #ifdef __cpp_lib_bit_cast
 #  include <bit>  // std::bitcast
@@ -485,19 +486,10 @@ inline auto get_data(Container& c) -> typename Container::value_type* {
   return c.data();
 }
 
-#if defined(_SECURE_SCL) && _SECURE_SCL
-// Make a checked iterator to avoid MSVC warnings.
-template <typename T> using checked_ptr = stdext::checked_array_iterator<T*>;
-template <typename T>
-constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
-  return {p, size};
-}
-#else
+// Use raw pointers for checked_ptr (avoids dependency on MSVC-specific
+// stdext::checked_array_iterator which may not be available in all toolsets).
 template <typename T> using checked_ptr = T*;
-template <typename T> constexpr auto make_checked(T* p, size_t) -> T* {
-  return p;
-}
-#endif
+template <typename T> constexpr auto make_checked(T* p, size_t) -> T* { return p; }
 
 // Attempts to reserve space for n extra characters in the output range.
 // Returns a pointer to the reserved range or a reference to it.
