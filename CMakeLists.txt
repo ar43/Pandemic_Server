@@ -18,15 +18,6 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 # Define executable output
 add_executable(Pandemic_Server ${SOURCES})
 
-# Handle dependencies (spdlog, nlohmann_json)
-find_package(spdlog REQUIRED)
-find_package(nlohmann_json REQUIRED)
-
-target_link_libraries(Pandemic_Server PRIVATE 
-    spdlog::spdlog
-    nlohmann_json::nlohmann_json
-)
-
 # Platform-specific linking & definitions
 if(WIN32)
     target_link_libraries(Pandemic_Server PRIVATE Ws2_32)
