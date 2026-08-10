@@ -18,6 +18,13 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 # Define executable output
 add_executable(Pandemic_Server ${SOURCES})
 
+# Copy assets next to the executable
+add_custom_command(TARGET Pandemic_Server POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/assets
+        $<TARGET_FILE_DIR:Pandemic_Server>/assets
+)
+
 # Platform-specific linking & definitions
 if(WIN32)
     target_link_libraries(Pandemic_Server PRIVATE Ws2_32)

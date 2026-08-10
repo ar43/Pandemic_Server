@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <cstdint>
 #include "city_color.h"
 #include "player_card.h"
 #include "infection_card.h"

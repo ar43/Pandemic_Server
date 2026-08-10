@@ -14,6 +14,10 @@ using json = nlohmann::json;
 Map::Map(std::string map_name)
 {
 	std::string full_path = std::format("assets/maps/{}", map_name);
+	if (!std::filesystem::exists(full_path)) {
+		spdlog::error("can't find file {}", full_path);
+		std::abort();
+	}
 	std::ifstream f(full_path);
 	std::string line;
 	while (std::getline(f, line))

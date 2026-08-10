@@ -3,6 +3,7 @@
 #include "card_stack.h"
 #include <memory>
 #include <string>
+#include <algorithm>
 
 PlayerInfo::PlayerInfo()
 {

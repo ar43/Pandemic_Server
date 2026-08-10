@@ -46,7 +46,7 @@ bool Server::Init()
     listen_socket = INVALID_SOCKET;
 
     struct addrinfo *result = NULL;
-    struct addrinfo hints;
+    struct addrinfo hints = {};
 
     // Initialize Winsock
 	if (!InitializeSockets()) {
@@ -54,7 +54,6 @@ bool Server::Init()
 		return false;
 	}
 
-    ZeroMemory(&hints, sizeof(hints));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
@@ -112,6 +111,8 @@ void Server::Run()
 
 	std::thread udp = SpawnUdp();
 
+	spdlog::info("Working directory: {}", std::filesystem::current_path().string());
+
     while (running)
     {
 		high_resolution_clock::time_point t1 = high_resolution_clock::now();
@@ -147,6 +148,7 @@ void Server::AcceptNewConnections()
     new_socket = accept(listen_socket, NULL, NULL);
     if (new_socket != INVALID_SOCKET) 
     {
+		SetNonBlocking(new_socket, true);
         auto new_client = std::make_unique<Client>(new_socket);
         awaiting_clients.push_back(std::move(new_client));
         spdlog::info("AcceptNewConnections: new client connected");

@@ -3,6 +3,7 @@
 #include <ctime>
 #include <ratio>
 #include <thread>
+#include <cmath>
 
 namespace util
 {
@@ -29,7 +30,7 @@ namespace util
 			double delta = observed - mean;
 			mean += delta / count;
 			m2   += delta * (observed - mean);
-			double stddev = sqrt(m2 / (count - 1));
+			double stddev = std::sqrt(m2 / (count - 1));
 			estimate = mean + stddev;
 		}
 
