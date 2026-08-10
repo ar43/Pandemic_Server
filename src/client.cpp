@@ -12,7 +12,7 @@
 
 
 
-Client::Client(SOCKET socket)
+Client::Client(socket_t socket)
 {
 	this->socket = socket;
 	this->state = ClientState::CSTATE_AWAITING;
@@ -33,17 +33,21 @@ Client::~Client()
 #pragma warning( disable : 4244)
 void Client::PrintSocketError()
 {
-	wchar_t *s = NULL;
-	FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 
+#if defined(PLATFORM_WINDOWS)
+	wchar_t* s = NULL;
+	FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		NULL, WSAGetLastError(),
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPWSTR)&s, 0, NULL);
-	//fprintf(stderr, "%S\n", s);
-	std::wstring ws(s);
-	// your new String
-	std::string str(ws.begin(), ws.end());
-	spdlog::warn(str);
-	LocalFree(s);
+	if (s) {
+		std::wstring ws(s);
+		std::string str(ws.begin(), ws.end());
+		spdlog::warn(str);
+		LocalFree(s);
+	}
+#else
+	spdlog::warn("Socket error: {}", strerror(errno));
+#endif
 }
 #pragma warning( pop ) 
 
@@ -56,7 +60,6 @@ void Client::Drop(std::string reason)
 		spdlog::info("dropped client (pid: {}) (reason: {})",pid, reason);
 	else
 		spdlog::info("dropped unconnected client (reason: {})", reason);
-	//closesocket(socket);
 }
 
 void Client::SendLobbyResponse(JoinLobbyResponse response)
@@ -108,7 +111,6 @@ void Client::RejectConnection(uint8_t code)
 	//SendOutput();
 	Drop("rejected connection with code " + std::to_string(code));
 	//active = false;
-	//closesocket(socket);
 }
 
 void Client::ReadInput()
@@ -140,27 +142,23 @@ void Client::ReadInput()
 		}
 		else if (result < 0)
 		{
-			if (WSAGetLastError() == WSAEWOULDBLOCK)
-			{
+			int err = GET_SOCKET_ERR();
+			if (err == ERR_EWOULDBLOCK) {
 				break;
 			}
-			if (WSAGetLastError() == WSAECONNRESET)
-			{
+			if (err == ERR_ECONNRESET) {
 				spdlog::info("ReadInput: client disconnected...");
 				disconnected = true;
 				break;
 			}
-			spdlog::warn("ReadInput: recv failed with error: {}", WSAGetLastError());
-			Client::PrintSocketError();
+			spdlog::warn("ReadInput: recv failed with error: {}", err);
 			break;
-			//closesocket(socket);
 		}
 		else if (result == 0)
 		{
 			spdlog::info("ReadInput: client disconnected...");
 			disconnected = true;
 			break;
-			//closesocket(socket);
 		}
 	}
 }
@@ -178,7 +176,7 @@ void Client::SendOutput()
 			int send_result = send( socket, buffer, i, 0 );
 			if (send_result == SOCKET_ERROR) 
 			{
-				spdlog::warn("SendOutput: send failed with error: {}", WSAGetLastError());
+				spdlog::warn("SendOutput: send failed with error: {}", GET_SOCKET_ERR());
 				Client::PrintSocketError();
 				return;
 			}
@@ -192,7 +190,7 @@ void Client::SendOutput()
 	int send_result = send( socket, buffer, i, 0 );
 	if (send_result == SOCKET_ERROR) 
 	{
-		spdlog::warn("SendOutput: send failed with error: {}", WSAGetLastError());
+		spdlog::warn("SendOutput: send failed with error: {}", GET_SOCKET_ERR());
 		Client::PrintSocketError();
 		return;
 	}

@@ -1,9 +1,9 @@
 #pragma once
-#include <winsock2.h>
 #include <queue>
 #include <string>
 #include <assert.h>
 #include <memory>
+#include "platform_socket.h"
 #include "randutils.hpp"
 #include "client_state.h"
 #include "join_lobby_response.h"
@@ -19,7 +19,7 @@ class Timer;
 class Client
 {
 public:
-	Client(SOCKET socket);
+	Client(socket_t socket);
 	~Client();
 
 	std::shared_ptr<MsgManager> msg_manager;
@@ -39,7 +39,7 @@ public:
 
 	void Update();
 
-	SOCKET socket;
+	socket_t socket;
 
 	int awaiting_substate = 0;
 	ClientState state;

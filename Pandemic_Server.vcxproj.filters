@@ -299,5 +299,8 @@
     <ClInclude Include="src\inc\out_update_research.h">
       <Filter>Header Files\Opcodes\Out</Filter>
     </ClInclude>
+    <ClInclude Include="src\inc\platform_socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

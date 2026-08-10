@@ -1,12 +1,6 @@
 #include "server.h"
 
-#undef UNICODE
-
-#define WIN32_LEAN_AND_MEAN
-
-#include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#include "platform_socket.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
@@ -26,9 +20,6 @@
 
 #include "spdlog/spdlog.h"
 #include "nlohmann/json.hpp"
-
-// Need to link with Ws2_32.lib
-#pragma comment (lib, "Ws2_32.lib")
 
 Server::Server()
 {
@@ -50,7 +41,6 @@ int Server::GenerateGameId()
 
 bool Server::Init()
 {
-    WSADATA wsaData;
     int iResult;
 
     listen_socket = INVALID_SOCKET;
@@ -59,11 +49,10 @@ bool Server::Init()
     struct addrinfo hints;
 
     // Initialize Winsock
-    iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (iResult != 0) {
-        spdlog::error("WSAStartup failed with error: {}", iResult);
-        return false;
-    }
+	if (!InitializeSockets()) {
+		spdlog::error("Failed to initialize sockets");
+		return false;
+	}
 
     ZeroMemory(&hints, sizeof(hints));
     hints.ai_family = AF_INET;
@@ -75,29 +64,28 @@ bool Server::Init()
     iResult = getaddrinfo(NULL, std::to_string(DEFAULT_PORT).c_str(), &hints, &result);
     if ( iResult != 0 ) {
         spdlog::error("getaddrinfo failed with error: {}", iResult);
-        WSACleanup();
+		CleanupSockets();
         return true;
     }
 
     // Create a SOCKET for the server to listen for client connections.
     listen_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (listen_socket == INVALID_SOCKET) {
-        spdlog::error("socket failed with error: {}", WSAGetLastError());
+        spdlog::error("socket failed with error: {}", GET_SOCKET_ERR());
         freeaddrinfo(result);
-        WSACleanup();
+		CleanupSockets();
         return true;
     }
 
-    u_long mode = 1;  // 1 to enable non-blocking socket
-    ioctlsocket(listen_socket, FIONBIO, &mode);
+	SetNonBlocking(listen_socket, true);
 
     // Setup the TCP listening socket
     iResult = bind( listen_socket, result->ai_addr, (int)result->ai_addrlen);
     if (iResult == SOCKET_ERROR) {
-        spdlog::error("bind failed with error: {}", WSAGetLastError());
+        spdlog::error("bind failed with error: {}", GET_SOCKET_ERR());
         freeaddrinfo(result);
-        closesocket(listen_socket);
-        WSACleanup();
+		CLOSE_SOCKET(listen_socket);
+		CleanupSockets();
         return false;
     }
 
@@ -105,9 +93,9 @@ bool Server::Init()
 
     iResult = listen(listen_socket, SOMAXCONN);
     if (iResult == SOCKET_ERROR) {
-        spdlog::error("listen failed with error: {}", WSAGetLastError());
-        closesocket(listen_socket);
-        WSACleanup();
+        spdlog::error("listen failed with error: {}", GET_SOCKET_ERR());
+		CLOSE_SOCKET(listen_socket);
+		CleanupSockets();
         return false;
     }
 
@@ -155,7 +143,7 @@ void Server::Tick()
 
 void Server::AcceptNewConnections()
 {
-    SOCKET new_socket = INVALID_SOCKET;
+	socket_t new_socket = INVALID_SOCKET;
     new_socket = accept(listen_socket, NULL, NULL);
     if (new_socket != INVALID_SOCKET) 
     {
@@ -175,7 +163,7 @@ void Server::UpdatePlayers()
 			{
 				if((*it)->state == ClientState::CSTATE_GAME)
 					spdlog::warn("dropped client {} while ingame", (*it)->GetPid());
-				closesocket((*it)->socket);
+				CLOSE_SOCKET((*it)->socket);
 				it = game->players.erase(it);
 			}
 			else
@@ -270,7 +258,7 @@ void Server::UpdateAwaitingClients()
         }
         else if ((*it)->dropped)
         {
-            closesocket((*it)->socket);
+			CLOSE_SOCKET((*it)->socket);
             it = awaiting_clients.erase(it);
         }
         else
@@ -337,7 +325,7 @@ void Server::UdpPingListener(uint16_t udp_port, const std::string& magic_ping, c
 
 	if (bind(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
 		perror("UDP bind failed");
-		_close(sockfd);
+		CLOSE_SOCKET(sockfd);
 		return;
 	}
 
@@ -365,7 +353,7 @@ void Server::UdpPingListener(uint16_t udp_port, const std::string& magic_ping, c
 		message.erase(message.find_last_not_of(" \n\r\t") + 1);
 
 		if (inet_ntop(AF_INET, &client_addr.sin_addr, client_ip_str, sizeof(client_ip_str)) == nullptr) {
-			strcpy_s(client_ip_str, "unknown");
+			snprintf(client_ip_str, sizeof(client_ip_str), "unknown");
 		}
 
 		if (message == magic_ping) {
@@ -375,6 +363,6 @@ void Server::UdpPingListener(uint16_t udp_port, const std::string& magic_ping, c
 		}
 	}
 
-	_close(sockfd);
+	CLOSE_SOCKET(sockfd);
 	spdlog::info("UDP listener stopped.");
 }

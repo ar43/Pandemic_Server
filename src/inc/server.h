@@ -1,11 +1,11 @@
 #pragma once
 
-#include <winsock2.h>
 #include <vector>
 #include <memory>
 #include <array>
 #include <queue>
 
+#include "platform_socket.h"
 #include "randutils.hpp"
 
 class Client;
@@ -41,7 +41,7 @@ private:
 	int GenerateGameId();
 
 	bool running;
-	SOCKET listen_socket;
+	socket_t listen_socket;
 	std::vector<std::unique_ptr<Client>> awaiting_clients;
 	std::vector<std::unique_ptr<Game>> games;
 

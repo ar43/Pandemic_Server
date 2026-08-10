@@ -13,7 +13,7 @@ int main()
 
 	server->Init();
 	server->Run();
-	WSACleanup();
+	CleanupSockets();
 	return 0;
 }
 
