@@ -396,3 +396,44 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# CMake Build Output Directories
+/build/
+/out/
+/cmake-build-*/
+
+# CMake Generated Files (In case someone runs cmake in the root)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Visual Studio / MSBuild files
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.vcxproj.globs
+
+# Visual Studio temporary files & cache
+.vs/
+*.suo
+*.user
+*.userosv
+*.sln.docstates
+
+# Compiled Binaries & Libraries
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.obj
+*.o
+
+# VS Code directory (optional, but good to ignore user workspace state)
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/settings.json
